@@ -1,0 +1,397 @@
+openapi: 3.1.0
+info:
+  title: booking
+  version: 1.0.0
+  description: |
+    Commission windows ("open comm"), their slots, clients' requests for them, and the Pricelist module.
+
+    Kept + taken slots never exceed the window's slotCount, however many clients request at once.
+
+    Shared conventions: contracts/README.md.
+servers:
+  - url: http://localhost:3001
+tags:
+  - name: Pricelist
+  - name: Windows
+  - name: Requests
+  - name: Notifications
+    description: Called by other services, not by the client.
+
+paths:
+  /artists/{artistId}/pricelist:
+    parameters:
+      - $ref: '#/components/parameters/ArtistId'
+    put:
+      tags: [Pricelist]
+      operationId: publishPricelist
+      summary: Artist publishes a new pricelist
+      description: Applies to windows opened from now on. Open windows keep theirs.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PricelistInput' }
+      responses:
+        '200':
+          description: Published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Pricelist' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+    get:
+      tags: [Pricelist]
+      operationId: getPricelist
+      summary: Artist's current pricelist
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Pricelist' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /windows:
+    post:
+      tags: [Windows]
+      operationId: openWindow
+      summary: Artist opens a commission window with a number of slots
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WindowInput' }
+      responses:
+        '201':
+          description: Window created with the artist's current pricelist
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Window' }
+        '409':
+          description: "`NoPricelist`: the artist has not published a pricelist yet"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+
+  /windows/{windowId}:
+    parameters:
+      - $ref: '#/components/parameters/WindowId'
+    get:
+      tags: [Windows]
+      operationId: getWindow
+      summary: A window, its prices and how many slots are left
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Window' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /windows/{windowId}/requests:
+    parameters:
+      - $ref: '#/components/parameters/WindowId'
+    post:
+      tags: [Requests]
+      operationId: requestSlot
+      summary: Client requests a slot (keeps one slot if any is left)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RequestInput' }
+      responses:
+        '201':
+          description: A slot is kept for this client; status SUBMITTED
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CommissionRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: |
+            - `SlotsFull`: every slot is kept or taken (the hard rule)
+            - `AlreadyHoldsSlot`: this client already has a kept or taken slot in this window
+            - `WindowNotOpen`: the window is scheduled or closed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+              examples:
+                slotsFull:
+                  value: { error: SlotsFull, message: "All 3 slots in 'October comms' are taken." }
+        '422':
+          description: "`UnknownTier`, `UnknownAddOn`, or `InvalidRequest`"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /requests/{requestId}:
+    parameters:
+      - $ref: '#/components/parameters/RequestId'
+    get:
+      tags: [Requests]
+      operationId: getRequest
+      summary: A request and where it stands
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CommissionRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /requests/{requestId}/accept:
+    parameters:
+      - $ref: '#/components/parameters/RequestId'
+    post:
+      tags: [Requests]
+      operationId: acceptRequest
+      summary: Artist accepts a request with a quote; a DP invoice is issued
+      description: Idempotent. A retry after success returns the same request and invoice.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quoteIDR:
+                  type: integer
+                  minimum: 0
+                  description: Defaults to listPriceIDR. Must not be below it.
+      responses:
+        '200':
+          description: Status ACCEPTED, with depositIDR, depositInvoiceId and payBy
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CommissionRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/InvalidTransition' }
+        '422':
+          description: "`QuoteBelowListPrice`"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '503':
+          description: "`PaymentsUnavailable`: no invoice could be issued; the request stays SUBMITTED; retry later"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /requests/{requestId}/decline:
+    parameters:
+      - $ref: '#/components/parameters/RequestId'
+    post:
+      tags: [Requests]
+      operationId: declineRequest
+      summary: Artist declines a submitted request; the slot is released
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Status DECLINED
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CommissionRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/InvalidTransition' }
+
+  /payment-notifications:
+    post:
+      tags: [Notifications]
+      operationId: receiveInvoicePaid
+      summary: InvoicePaid from payments (idempotent)
+      description: |
+        Marks the request BOOKED (slot kept -> taken) and sends CommissionBooked to studio.
+        A repeat changes nothing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InvoicePaid' }
+      responses:
+        '200': { description: 'Applied (or already applied earlier)' }
+        '422':
+          description: "`UnknownReference`: no request with this reference (payments stops retrying)"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '503':
+          description: "`StudioUnavailable`: request is BOOKED but studio was not reached; payments will retry"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+components:
+  parameters:
+    ArtistId:
+      name: artistId
+      in: path
+      required: true
+      schema: { type: string }
+    WindowId:
+      name: windowId
+      in: path
+      required: true
+      schema: { type: string }
+    RequestId:
+      name: requestId
+      in: path
+      required: true
+      schema: { type: string }
+
+  responses:
+    NotFound:
+      description: "`NotFound`"
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unprocessable:
+      description: "`InvalidInput`: body fails validation; message says which field"
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    InvalidTransition:
+      description: "`InvalidTransition`: not allowed from the current status"
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    Error:
+      type: object
+      required: [error, message]
+      properties:
+        error: { type: string, description: Stable code }
+        message: { type: string, description: 'Human-readable; may change' }
+
+    Item:
+      type: object
+      required: [code, name]
+      properties:
+        code: { type: string, examples: [HALF_BODY] }
+        name: { type: string, examples: [Half body] }
+
+    PricelistInput:
+      type: object
+      required: [tiers, depositPercent, revisionLimit]
+      properties:
+        tiers:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [code, name, startFromIDR]
+            properties:
+              code: { type: string }
+              name: { type: string }
+              startFromIDR: { type: integer, minimum: 1 }
+        addOns:
+          type: array
+          default: []
+          items:
+            type: object
+            required: [code, name, priceIDR]
+            properties:
+              code: { type: string }
+              name: { type: string }
+              priceIDR: { type: integer, minimum: 0 }
+        depositPercent: { type: integer, minimum: 1, maximum: 100, examples: [50] }
+        revisionLimit: { type: integer, minimum: 0, examples: [2] }
+
+    Pricelist:
+      allOf:
+        - $ref: '#/components/schemas/PricelistInput'
+        - type: object
+          required: [artistId, publishedAt]
+          properties:
+            artistId: { type: string }
+            publishedAt: { type: string, format: date-time }
+
+    WindowInput:
+      type: object
+      required: [artistId, title, slotCount, opensAt, closesAt]
+      properties:
+        artistId: { type: string, examples: [rara] }
+        title: { type: string, examples: [October comms] }
+        slotCount: { type: integer, minimum: 1, examples: [3] }
+        opensAt: { type: string, format: date-time }
+        closesAt: { type: string, format: date-time, description: Must be after opensAt }
+
+    Window:
+      type: object
+      required: [windowId, artistId, title, status, slotCount, slotsLeft, opensAt, closesAt, pricelist]
+      properties:
+        windowId: { type: string }
+        artistId: { type: string }
+        title: { type: string }
+        status:
+          type: string
+          description: May gain values. Use slotsLeft to decide whether a slot can still be requested.
+          enum: [SCHEDULED, OPEN, FULL, CLOSED]
+        slotCount: { type: integer }
+        slotsLeft: { type: integer, minimum: 0 }
+        opensAt: { type: string, format: date-time }
+        closesAt: { type: string, format: date-time }
+        pricelist: { $ref: '#/components/schemas/PricelistInput' }
+
+    RequestInput:
+      type: object
+      required: [clientId, tier, brief]
+      properties:
+        clientId: { type: string, examples: [budi] }
+        tier: { type: string, description: Tier code from the window's pricelist, examples: [HALF_BODY] }
+        addOns:
+          type: array
+          default: []
+          items: { type: string, description: Add-on code }
+        brief: { type: string, maxLength: 4000 }
+        referenceLinks:
+          type: array
+          default: []
+          maxItems: 10
+          items: { type: string, format: uri }
+
+    CommissionRequest:
+      type: object
+      required: [requestId, windowId, artistId, clientId, status, tier, addOns, brief, referenceLinks, listPriceIDR, submittedAt]
+      properties:
+        requestId: { type: string }
+        windowId: { type: string }
+        artistId: { type: string }
+        clientId: { type: string }
+        status:
+          type: string
+          description: May gain values.
+          enum: [SUBMITTED, ACCEPTED, BOOKED, DECLINED, EXPIRED]
+        tier: { $ref: '#/components/schemas/Item' }
+        addOns:
+          type: array
+          items: { $ref: '#/components/schemas/Item' }
+        brief: { type: string }
+        referenceLinks:
+          type: array
+          items: { type: string, format: uri }
+        listPriceIDR: { type: integer, description: Tier start-from price plus add-ons }
+        quoteIDR: { type: integer, description: Present from ACCEPTED }
+        depositIDR: { type: integer, description: Present from ACCEPTED }
+        depositInvoiceId: { type: string, description: Present from ACCEPTED }
+        payBy: { type: string, format: date-time, description: Present from ACCEPTED }
+        commissionId: { type: string, description: Present once studio has queued it }
+        submittedAt: { type: string, format: date-time }
+
+    InvoicePaid:
+      description: Defined by payments.openapi.yaml.
+      type: object
+      required: [invoiceId, reference, purpose, amountIDR, paidAt]
+      properties:
+        invoiceId: { type: string }
+        reference: { type: string, description: The requestId given when the invoice was created }
+        purpose: { type: string, examples: [dp] }
+        amountIDR: { type: integer }
+        paidAt: { type: string, format: date-time }

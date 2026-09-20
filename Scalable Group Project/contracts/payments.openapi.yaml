@@ -1,0 +1,232 @@
+openapi: 3.1.0
+info:
+  title: payments
+  version: 1.0.0
+  description: |
+    Invoices ("tagihan"), settlements from the payment provider, and paid notifications back to whoever
+    asked for the invoice.
+
+    `reference` and `purpose` are stored and returned unchanged, never interpreted.
+    A settlement is applied once, even if the provider's callback arrives twice.
+
+    Shared conventions: contracts/README.md.
+servers:
+  - url: http://localhost:3002
+tags:
+  - name: Invoices
+  - name: Provider
+    description: Called by the payment provider (simulated in v1 by the thin client).
+
+paths:
+  /invoices:
+    post:
+      tags: [Invoices]
+      operationId: createInvoice
+      summary: Ask Payments to collect an amount from a payer
+      description: 'Idempotent on (reference, purpose): a repeat returns the existing invoice with 200.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InvoiceInput' }
+      responses:
+        '201':
+          description: Issued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Invoice' }
+        '200':
+          description: 'An invoice for this (reference, purpose) already exists; returned unchanged'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Invoice' }
+        '422':
+          description: "`InvalidInput`"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+      callbacks:
+        invoicePaid:
+          '{$request.body#/notifyUrl}':
+            post:
+              summary: InvoicePaid, sent when the invoice becomes PAID
+              description: |
+                At least once: retried on network errors and 5xx, stopped on 2xx and 4xx.
+                Receivers must be idempotent.
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema: { $ref: '#/components/schemas/InvoicePaid' }
+              responses:
+                '200': { description: Received }
+
+  /invoices/{invoiceId}:
+    parameters:
+      - $ref: '#/components/parameters/InvoiceId'
+    get:
+      tags: [Invoices]
+      operationId: getInvoice
+      summary: An invoice and its status
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Invoice' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /invoices/{invoiceId}/void:
+    parameters:
+      - $ref: '#/components/parameters/InvoiceId'
+    post:
+      tags: [Invoices]
+      operationId: voidInvoice
+      summary: Cancel an unpaid invoice (e.g. the DP deadline passed)
+      description: |
+        Paid and void are exclusive. If a settlement landed first this returns 409 AlreadyPaid, and the
+        caller must wait for InvoicePaid rather than give the slot away. Voiding a VOID invoice returns 200.
+      responses:
+        '200':
+          description: Status VOID
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Invoice' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: "`AlreadyPaid`"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /provider/callbacks:
+    post:
+      tags: [Provider]
+      operationId: receiveSettlement
+      summary: Settlement callback from the payment provider
+      description: |
+        The first callback for a providerRef marks the invoice PAID and queues InvoicePaid.
+        A repeat returns 200 with applied=false and changes nothing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Settlement' }
+      responses:
+        '200':
+          description: 'Received; `applied` says whether this callback changed anything'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SettlementResult' }
+              examples:
+                first:
+                  value: { applied: true, invoiceStatus: PAID }
+                duplicate:
+                  value: { applied: false, invoiceStatus: PAID }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: "`InvoiceNotPayable`: the invoice is VOID (money must be refunded by the provider)"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422':
+          description: "`AmountMismatch`: settled amount differs from the invoice amount"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+components:
+  parameters:
+    InvoiceId:
+      name: invoiceId
+      in: path
+      required: true
+      schema: { type: string }
+
+  responses:
+    NotFound:
+      description: "`NotFound`"
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    Error:
+      type: object
+      required: [error, message]
+      properties:
+        error: { type: string, description: Stable code }
+        message: { type: string, description: 'Human-readable; may change' }
+
+    InvoiceInput:
+      type: object
+      required: [reference, purpose, payerId, payeeId, amountIDR, notifyUrl]
+      properties:
+        reference:
+          type: string
+          description: "Caller's own id (e.g. a requestId or commissionId). Opaque; returned unchanged."
+        purpose:
+          type: string
+          description: "Caller's label (e.g. dp, pelunasan). Opaque; returned unchanged."
+          examples: [dp]
+        payerId: { type: string, examples: [budi] }
+        payeeId: { type: string, examples: [rara] }
+        amountIDR: { type: integer, minimum: 1, examples: [175000] }
+        dueAt:
+          type: string
+          format: date-time
+          description: Shown to the payer. Invoices never expire on their own; the caller voids them.
+        notifyUrl:
+          type: string
+          format: uri
+          description: Where InvoicePaid is POSTed
+          examples: ['http://localhost:3001/payment-notifications']
+
+    Invoice:
+      type: object
+      required: [invoiceId, reference, purpose, payerId, payeeId, amountIDR, status, createdAt]
+      properties:
+        invoiceId: { type: string }
+        reference: { type: string }
+        purpose: { type: string }
+        payerId: { type: string }
+        payeeId: { type: string }
+        amountIDR: { type: integer }
+        status:
+          type: string
+          description: May gain values.
+          enum: [ISSUED, PAID, VOID]
+        dueAt: { type: string, format: date-time }
+        paidAt: { type: string, format: date-time, description: Present when PAID }
+        createdAt: { type: string, format: date-time }
+
+    Settlement:
+      type: object
+      required: [providerRef, invoiceId, amountIDR, status]
+      properties:
+        providerRef:
+          type: string
+          description: "The provider's transaction id. Applied at most once."
+          examples: [SIM-000123]
+        invoiceId: { type: string }
+        amountIDR: { type: integer }
+        status:
+          type: string
+          enum: [SETTLED]
+
+    SettlementResult:
+      type: object
+      required: [applied, invoiceStatus]
+      properties:
+        applied: { type: boolean }
+        invoiceStatus: { type: string, enum: [ISSUED, PAID, VOID] }
+
+    InvoicePaid:
+      type: object
+      required: [invoiceId, reference, purpose, amountIDR, paidAt]
+      properties:
+        invoiceId: { type: string }
+        reference: { type: string, description: As given in InvoiceInput }
+        purpose: { type: string, description: As given in InvoiceInput }
+        amountIDR: { type: integer }
+        paidAt: { type: string, format: date-time }

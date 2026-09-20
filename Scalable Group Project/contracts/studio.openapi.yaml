@@ -1,0 +1,310 @@
+openapi: 3.1.0
+info:
+  title: studio
+  version: 1.0.0
+  description: |
+    A commission's life as a piece of artwork: queue, sketch, revisions, final, and the hi-res file once
+    nothing is left to pay.
+
+    Revisions never exceed the limit agreed at booking, and the hi-res link stays hidden while a balance
+    is due. No deposit policy here: balanceDue = quoteIDR - paidIDR, both from booking.
+
+    Files are links; no uploads. Shared conventions: contracts/README.md.
+servers:
+  - url: http://localhost:3003
+tags:
+  - name: Commissions
+  - name: Queue
+  - name: Notifications
+    description: Called by other services, not by the client.
+
+paths:
+  /commissions:
+    post:
+      tags: [Commissions]
+      operationId: queueCommission
+      summary: CommissionBooked from booking; queues the commission
+      description: Idempotent on bookingRef. A repeat returns the existing commission with 200.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CommissionBooked' }
+      responses:
+        '201':
+          description: Queued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Commission' }
+        '200':
+          description: Already queued for this bookingRef
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Commission' }
+        '422':
+          description: "`InvalidInput`"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /commissions/{commissionId}:
+    parameters:
+      - $ref: '#/components/parameters/CommissionId'
+    get:
+      tags: [Commissions]
+      operationId: getCommission
+      summary: Where a commission stands
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Commission' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /artists/{artistId}/queue:
+    parameters:
+      - name: artistId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Queue]
+      operationId: getQueue
+      summary: "The artist's queue (antrian), in working order; completed ones excluded"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [artistId, commissions]
+                properties:
+                  artistId: { type: string }
+                  commissions:
+                    type: array
+                    items: { $ref: '#/components/schemas/Commission' }
+
+  /commissions/{commissionId}/sketch:
+    parameters:
+      - $ref: '#/components/parameters/CommissionId'
+    post:
+      tags: [Commissions]
+      operationId: sendSketch
+      summary: Artist sends a sketch (from QUEUED or REVISION_REQUESTED)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sketchUrl]
+              properties:
+                sketchUrl: { type: string, format: uri }
+      responses:
+        '200':
+          description: Status SKETCH_REVIEW
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Commission' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/InvalidTransition' }
+
+  /commissions/{commissionId}/sketch/approve:
+    parameters:
+      - $ref: '#/components/parameters/CommissionId'
+    post:
+      tags: [Commissions]
+      operationId: approveSketch
+      summary: Client approves the sketch (from SKETCH_REVIEW)
+      responses:
+        '200':
+          description: Status IN_PROGRESS
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Commission' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/InvalidTransition' }
+
+  /commissions/{commissionId}/sketch/revisions:
+    parameters:
+      - $ref: '#/components/parameters/CommissionId'
+    post:
+      tags: [Commissions]
+      operationId: requestRevision
+      summary: Client asks for a revision (from SKETCH_REVIEW)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [notes]
+              properties:
+                notes: { type: string, maxLength: 2000 }
+      responses:
+        '200':
+          description: Status REVISION_REQUESTED; revisionsUsed incremented
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Commission' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: |
+            - `RevisionLimitReached`: revisionsUsed already equals revisionLimit
+            - `InvalidTransition`: no sketch is waiting for review
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /commissions/{commissionId}/final:
+    parameters:
+      - $ref: '#/components/parameters/CommissionId'
+    post:
+      tags: [Commissions]
+      operationId: sendFinal
+      summary: Artist sends the final (from IN_PROGRESS)
+      description: |
+        With a balance due, payments is asked for a pelunasan invoice and the status becomes AWAITING_BALANCE.
+        With none, the status becomes COMPLETED. Idempotent.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [previewUrl, finalFileUrl]
+              properties:
+                previewUrl: { type: string, format: uri, description: Watermarked or low-res; visible to the client }
+                finalFileUrl: { type: string, format: uri, description: Hi-res; hidden until balance is paid }
+      responses:
+        '200':
+          description: Status AWAITING_BALANCE (with remainderInvoiceId) or COMPLETED
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Commission' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/InvalidTransition' }
+        '503':
+          description: "`PaymentsUnavailable`: nothing changed; retry later"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /payment-notifications:
+    post:
+      tags: [Notifications]
+      operationId: receiveInvoicePaid
+      summary: InvoicePaid from payments (idempotent)
+      description: |
+        The pelunasan invoice sets balanceDueIDR to 0, status COMPLETED, and reveals finalFileUrl.
+        A repeat changes nothing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [invoiceId, reference, purpose, amountIDR, paidAt]
+              description: Defined by payments.openapi.yaml (InvoicePaid). reference is the commissionId.
+              properties:
+                invoiceId: { type: string }
+                reference: { type: string }
+                purpose: { type: string, examples: [pelunasan] }
+                amountIDR: { type: integer }
+                paidAt: { type: string, format: date-time }
+      responses:
+        '200': { description: 'Applied (or already applied earlier)' }
+        '422':
+          description: "`UnknownReference` (payments stops retrying)"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+components:
+  parameters:
+    CommissionId:
+      name: commissionId
+      in: path
+      required: true
+      schema: { type: string }
+
+  responses:
+    NotFound:
+      description: "`NotFound`"
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    InvalidTransition:
+      description: "`InvalidTransition`: not allowed from the current status"
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    Error:
+      type: object
+      required: [error, message]
+      properties:
+        error: { type: string, description: Stable code }
+        message: { type: string, description: 'Human-readable; may change' }
+
+    Item:
+      type: object
+      required: [code, name]
+      properties:
+        code: { type: string, examples: [HALF_BODY] }
+        name: { type: string, examples: [Half body] }
+
+    CommissionBooked:
+      type: object
+      required: [bookingRef, artistId, clientId, tier, brief, quoteIDR, paidIDR, revisionLimit]
+      properties:
+        bookingRef: { type: string, description: "Booking's requestId; one commission per bookingRef" }
+        artistId: { type: string }
+        clientId: { type: string }
+        tier: { $ref: '#/components/schemas/Item' }
+        addOns:
+          type: array
+          default: []
+          items: { $ref: '#/components/schemas/Item' }
+        brief: { type: string }
+        referenceLinks:
+          type: array
+          default: []
+          items: { type: string, format: uri }
+        quoteIDR: { type: integer, minimum: 0, examples: [350000] }
+        paidIDR: { type: integer, minimum: 0, examples: [175000] }
+        revisionLimit: { type: integer, minimum: 0, examples: [2] }
+
+    Commission:
+      type: object
+      required: [commissionId, bookingRef, artistId, clientId, status, tier, addOns, brief, referenceLinks,
+                 revisionLimit, revisionsUsed, quoteIDR, balanceDueIDR, queuedAt]
+      properties:
+        commissionId: { type: string }
+        bookingRef: { type: string }
+        artistId: { type: string }
+        clientId: { type: string }
+        status:
+          type: string
+          description: May gain values. Internal stages (lineart, coloring...) all show as IN_PROGRESS.
+          enum: [QUEUED, SKETCH_REVIEW, REVISION_REQUESTED, IN_PROGRESS, AWAITING_BALANCE, COMPLETED]
+        tier: { $ref: '#/components/schemas/Item' }
+        addOns:
+          type: array
+          items: { $ref: '#/components/schemas/Item' }
+        brief: { type: string }
+        referenceLinks:
+          type: array
+          items: { type: string, format: uri }
+        revisionLimit: { type: integer }
+        revisionsUsed: { type: integer }
+        sketchUrl: { type: string, format: uri, description: Latest sketch }
+        previewUrl: { type: string, format: uri }
+        finalFileUrl: { type: string, format: uri, description: Present only when COMPLETED }
+        quoteIDR: { type: integer }
+        balanceDueIDR: { type: integer, minimum: 0 }
+        remainderInvoiceId: { type: string, description: Present from AWAITING_BALANCE }
+        queuedAt: { type: string, format: date-time }
