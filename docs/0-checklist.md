@@ -17,10 +17,10 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 
 | # | Item | Required by | Status | What's left |
 |---|---|---|---|---|
-| A1 | Git repository initialised | §6 Repository | ⚠ ☐ | `git init` has never been run here |
-| A2 | First commit is `/docs` + `/contracts`, no service code | Deduction −5 | ⚠ ☐ | Must land before anyone writes a service |
-| A3 | Public repo on GitHub/GitLab, link submitted | §6 | ☐ | Private is fine if the instructor is a collaborator |
-| A4 | Layout: `/README.md`, `/docs/`, `/contracts/`, `/services/<name>/` | §6 | ☑ | Matches the handout |
+| A1 | Git repository initialised | §6 Repository | ☑ | Pushed to `Troggz/Scalable---Group-Assignment` |
+| A2 | First commit is `/docs` + `/contracts`, no service code | Deduction −5 | ☑ | Committed with no service code present; keep it that way until the contracts are final |
+| A3 | Public repo on GitHub/GitLab, link submitted | §6 | ◐ | Repo exists; **confirm it is public** (or add the instructor) and submit the link |
+| A4 | Layout: `/README.md`, `/docs/`, `/contracts/`, `/services/<name>/` | §6 | ☑ | At the repository root, as the handout requires |
 | A5 | `.gitignore` (no `.env`, no `node_modules`) | B2 hygiene | ☑ | |
 | A6 | Team name, three names, three NIMs | §6 front page | ☐ | Placeholders in [proposal.md](proposal.md) |
 | A7 | One owner per service, each reviews another | B5 | ◐ | Rotation designed in [../README.md](../README.md); names are `_TBD_` |
@@ -68,7 +68,7 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | D6 | One bad coupling found and fixed, before and after | §4.2 | ☑ | Two: pass-through and common |
 | D7 | Cost-of-change test on three realistic changes | §4.3 | ☑ | Two touch one service, one touches two |
 | D8 | A contract per service in `/contracts` | §4.4 | ☑ | Three OpenAPI 3.1 files |
-| D9 | Contracts committed **before** the code | §4.4, −5 | ⚠ ☐ | Written but uncommitted; depends on A2 |
+| D9 | Contracts committed **before** the code | §4.4, −5 | ☑ | Committed while `/services` held only READMEs |
 | D10 | Three hidden decisions per service + what stops a breaking change | §4.4 | ☑ | [3-boundaries.md](3-boundaries.md) §3.4 |
 
 ## E. Step 4 — The thin build (10 + 10 + 5 pts)
@@ -119,15 +119,15 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | G2 | No services that must be deployed together | −10 | ◐ | Cost-of-change test says no; the build must confirm |
 | G3 | No service named after a layer or table | −5 | ☑ | booking, payments, studio |
 | G4 | At most three services | −5 | ☑ | Pricelist stays a module for this reason |
-| G5 | Contracts committed before the code | −5 | ⚠ ☐ | See A2 and D9 |
+| G5 | Contracts committed before the code | −5 | ☑ | See A2 and D9 |
 | G6 | Even contribution, visible in README and history | up to −10 each | ☐ | Depends on A7 and E18 |
 
 ---
 
 ## The short version
 
-1. `git init`, commit `/docs` and `/contracts`, push. Do this before any service code (A1, A2, G5).
-2. Fill in the team, owners, and interviewee; submit the proposal (A6, A7, A9).
+1. ~~`git init`, commit `/docs` and `/contracts`, push~~ — done. Contracts are on record before any service code (A1, A2, G5).
+2. Fill in the team, owners, and interviewee; submit the proposal (A6, A7, A9). **This is the next thing to do.**
 3. Interview, then event storming. Rewrite the glossary in the artist's words and settle C11 (C1–C6, C11).
 4. Pick the stack; each owner builds their service against the contracts, stubbing the others (A8, E2–E4).
 5. Wire up, run the demo script including the concurrency check, write the README from a clean clone (E14–E16).
