@@ -3,21 +3,11 @@
 The outside person should be an **artist who has run at least one open comm with slots**. A frequent commissioner is
 the second-best choice. They give a 20-minute interview first, then join the 90-minute session.
 
-## 20-minute interview guide
+## 20-minute interview
 
-Record it with permission. Write down **the exact words they use**, because those words become the glossary.
-
-1. Walk us through your last open comm, from the announcement post to sending the final file.
-2. How do you decide how many slots to open? What does "slot" mean to you?
-3. What happens when more people want a slot than you have? Has anyone ever got a slot that didn't exist?
-4. When does a slot count as *theirs*? When they fill the form, when you say yes, or when the DP arrives?
-5. How much DP do you ask for, and how long do you wait for it? What happens when someone ghosts?
-6. What's in your TOS? What makes you decline a request?
-7. Do you ever charge more than your pricelist says? When?
-8. What counts as a revision? How many are free? What about small fixes on the final?
-9. When do you send the final file? Do you watermark previews?
-10. Have you ever been unsure whether someone actually paid, or been paid twice?
-11. What's the most annoying part of running comms?
+Moved to its own file: **[2-interview.md](2-interview.md)** — roles, a minute-by-minute budget, the questions
+marked by priority, how to harvest the glossary in the artist’s own words, and the probe for the two terms that
+change meaning across the business.
 
 ## 90-minute session agenda (Appendix B)
 

@@ -19,13 +19,13 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 |---|---|---|---|---|
 | A1 | Git repository initialised | §6 Repository | ☑ | Pushed to `Troggz/Scalable---Group-Assignment` |
 | A2 | First commit is `/docs` + `/contracts`, no service code | Deduction −5 | ☑ | Committed with no service code present; keep it that way until the contracts are final |
-| A3 | Public repo on GitHub/GitLab, link submitted | §6 | ◐ | Repo exists; **confirm it is public** (or add the instructor) and submit the link |
+| A3 | Public repo on GitHub/GitLab, link submitted | §6 | ◐ | Confirmed public (unauthenticated API read succeeds); **link still to submit** |
 | A4 | Layout: `/README.md`, `/docs/`, `/contracts/`, `/services/<name>/` | §6 | ☑ | At the repository root, as the handout requires |
 | A5 | `.gitignore` (no `.env`, no `node_modules`) | B2 hygiene | ☑ | |
-| A6 | Team name, three names, three NIMs | §6 front page | ☐ | Placeholders in [proposal.md](proposal.md) |
-| A7 | One owner per service, each reviews another | B5 | ◐ | Rotation designed in [../README.md](../README.md); names are `_TBD_` |
-| A8 | Stack decided (language, framework, database) | §5 | ☐ | Open decision in [README.md](README.md) |
-| A9 | Week 2 proposal submitted to LMS | Week 2, mandatory | ☐ | [proposal.md](proposal.md) still has `_name_`, `_date_`; app claim is first-come |
+| A6 | Team name, three names, three NIMs | §6 front page | ☑ | Team **OpenComm**; three names and NIMs in [proposal.md](proposal.md) and [proposal.pdf](proposal.pdf) |
+| A7 | One owner per service, each reviews another | B5 | ☑ | Thomas → `booking`, Ethan → `payments`, Asthar → `studio`; each reviews the next ([../README.md](../README.md)) |
+| A8 | Stack decided (language, framework, database) | §5 | ☑ | **Node.js + PostgreSQL**, one DB and one role per service |
+| A9 | Week 2 proposal submitted to LMS | Week 2, mandatory | ◐ | [proposal.pdf](proposal.pdf) complete except the four interviewee fields (name, rounds, platform/handle, two dates). Fill after 2026-09-22 and submit; app claim is first-come |
 | A10 | Outside person confirmed, interview + session booked | §2, §3.1 | ☐ | Artist who has run an open comm with slots |
 
 ## B. Step 1 — The app (15 pts)
@@ -54,7 +54,7 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | C8 | One aggregate carries the hard rule | §3.3 | ☑ | CommissionWindow |
 | C9 | Three to five bounded contexts, each aggregate in exactly one | §3.4 | ☑ | Four contexts in [2-contexts.md](2-contexts.md) |
 | C10 | Contexts are business activities, not tables | §3.4 quick check | ☑ | Booking, Pricelist, Payments, Studio |
-| C11 | Resolve the hot spot: is a slot kept at request, accept, or DP? | §3.1 | ☐ | **Blocks the build.** A "DP" answer moves the hard rule and redraws the boundary |
+| C11 | Resolve the hot spot: is a slot kept at request, accept, or DP? | §3.1 | ◐ | Provisional answer **at DP** ([2-findings.md](2-findings.md)). Still **blocks the build** until a real artist confirms; if it holds, Option B moves the race to the payment step and booking’s contract changes |
 
 ## D. Step 3 — The boundaries (15 + 10 pts)
 

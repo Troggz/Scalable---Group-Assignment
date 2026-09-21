@@ -9,10 +9,13 @@ so after the session, go back and replace or confirm every draft term.
 | [0-checklist.md](0-checklist.md) | Every requirement, done and not done | Tick as you go |
 | [proposal.md](proposal.md) | Week 2 one-page proposal | Draft: fill in names and the interviewee |
 | [1-app.md](1-app.md) | 1 The app (Step 1, items 1.a–1.e) | Draft |
-| [2-event-storming.md](2-event-storming.md) | 2 The domain: interview guide, session agenda, candidate events | Prep; the session hasn't happened |
+| [2-interview.md](2-interview.md) | 2 The domain: the 20-minute interview guide | Ready to run; interview not done |
+| [2-event-storming.md](2-event-storming.md) | 2 The domain: session agenda, candidate events, hot spots | Prep; the session hasn't happened |
+| [2-findings.md](2-findings.md) | 2 The domain: provisional findings, C11 branches, scope guards | **PROVISIONAL**: confirm 2026-09-22 |
 | [2-glossary.md](2-glossary.md) | 2 The domain: glossary and context-dependent terms | **DRAFT**: confirm in interview |
 | [2-aggregates.md](2-aggregates.md) | 2 The domain: aggregate cards | Draft |
 | [2-contexts.md](2-contexts.md) | 2 The domain: bounded contexts | Draft |
+| [3-option-b.md](3-option-b.md) | 3 The boundaries: prepared contract revision if C11 resolves to "at DP" | Not applied; waiting on the interview |
 | [3-boundaries.md](3-boundaries.md) | 3 The boundaries: diagram, coupling, cost of change, what each service hides | Draft |
 | [4-build-plan.md](4-build-plan.md) | 4 The build: thin-build script, hard-rule enforcement, screencast plan, incident log | Plan |
 | [../contracts/](../contracts/) | Contracts (4.4) | v1 draft: commit before any code |
@@ -45,8 +48,8 @@ uneven contribution (up to −10 each).
 
 ## Open decisions (team)
 
-- [ ] Final app name. "OpenComm" is a working title.
-- [ ] Who owns which service; reviewer rotation.
+- [x] App name **OpenComm**; also the team name. Decided 2026-09-21.
+- [x] Owners: Thomas → `booking`, Ethan → `payments`, Asthar → `studio`; each reviews the next.
 - [ ] Interviewee: an artist who has run at least one open comm with slots. They must also attend the 90-minute session.
-- [ ] Stack. Suggested: Node.js 24 + PostgreSQL, with one database and one login role per service (makes B2 easy to prove).
+- [x] **Stack: Node.js + PostgreSQL**, one database and one login role per service (makes B2 easy to prove). Decided 2026-09-21.
 - [ ] Hold durations for the demo (real: DP within 1×24 hours; demo: a few minutes, set by an environment variable).

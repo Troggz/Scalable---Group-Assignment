@@ -15,9 +15,9 @@ This is **not a marketplace** (rule R4). There is no browsing, search, ratings, 
 
 | Service    | Bounded context(s)            | Port | Database / credentials         | Owner | Reviews   |
 |------------|-------------------------------|------|--------------------------------|-------|-----------|
-| `booking`  | Booking (+ Pricelist module)  | 3001 | `booking_db` / `booking_user`  | _TBD_ | `payments`|
-| `payments` | Payments                      | 3002 | `payments_db` / `payments_user`| _TBD_ | `studio`  |
-| `studio`   | Studio                        | 3003 | `studio_db` / `studio_user`    | _TBD_ | `booking` |
+| `booking`  | Booking (+ Pricelist module)  | 3001 | `booking_db` / `booking_user`  | Thomas | `payments`|
+| `payments` | Payments                      | 3002 | `payments_db` / `payments_user`| Ethan | `studio`  |
+| `studio`   | Studio                        | 3003 | `studio_db` / `studio_user`    | Asthar | `booking` |
 
 Every member owns one service and reviews the next one. Put the names in once they're decided.
 

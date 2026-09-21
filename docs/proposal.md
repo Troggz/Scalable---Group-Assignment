@@ -1,6 +1,6 @@
 # Week 2 proposal: OpenComm (working title)
 
-**Team:** _name_ · _member 1 (NIM)_ · _member 2 (NIM)_ · _member 3 (NIM)_
+**Team:** OpenComm · Thomas Nadandra Aryawida (24/536628/PA/22760) · Ryan Ethan Halim (24/536718/PA/22765) · Muhammad Asthar Bin Rizwan (24/546649/PA/23208)
 
 ## The app
 
