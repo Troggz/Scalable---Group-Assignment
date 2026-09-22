@@ -25,7 +25,7 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | A6 | Team name, three names, three NIMs | §6 front page | ☑ | Team **OpenComm**; three names and NIMs in [proposal.md](proposal.md) and [proposal.pdf](proposal.pdf) |
 | A7 | One owner per service, each reviews another | B5 | ☑ | Thomas → `booking`, Ethan → `payments`, Asthar → `studio`; each reviews the next ([../README.md](../README.md)) |
 | A8 | Stack decided (language, framework, database) | §5 | ☑ | **Node.js + PostgreSQL**, one DB and one role per service |
-| A9 | Week 2 proposal submitted to LMS | Week 2, mandatory | ◐ | [proposal.pdf](proposal.pdf) complete except the four interviewee fields (name, rounds, platform/handle, two dates). Fill after 2026-09-22 and submit; app claim is first-come |
+| A9 | Week 2 proposal submitted to LMS | Week 2, mandatory | ◐ | [proposal.pdf](proposal.pdf) rebuilt 2026-09-22: all four interviewee fields filled, no draft markings. **Still to submit**; app claim is first-come |
 | A10 | Outside person confirmed, interview + session booked | §2, §3.1 | ☑ | Eja: interview and 90-minute session both done 2026-09-22 |
 
 ## B. Step 1 — The app (15 pts)

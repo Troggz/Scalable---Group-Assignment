@@ -49,5 +49,5 @@ We don't process images: sketches and finals are links, and watermarking is left
 
 ## Who we will interview
 
-**Eja**, an illustrator who runs open comms in batches of about five slots. She answered our six questions in
-writing on 22 September 2026. We are arranging a 90-minute event-storming session with her on _date_.
+**Eja** — Discord, `clasymore` — an illustrator who runs open comms in batches of about five slots. Eja answered our
+six questions in writing on 22 September 2026, and joined our 90-minute event-storming session the same day.
