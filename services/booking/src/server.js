@@ -9,6 +9,7 @@ import { pricelistRoutes } from './routes/pricelist.js';
 import { windowRoutes } from './routes/windows.js';
 import { requestRoutes } from './routes/requests.js';
 import { notificationRoutes } from './routes/notifications.js';
+import { startExpirySweep } from './expiry.js';
 
 const app = express();
 app.use(express.json({ limit: '128kb' }));
@@ -67,11 +68,16 @@ app.use((err, _req, res, _next) => {
 const server = app.listen(config.port, () => {
   console.log(`[booking] listening on :${config.port}`);
   console.log(`[booking] payments at ${config.paymentsUrl}, studio at ${config.studioUrl}`);
+  console.log(`[booking] DP deadline ${config.dpDeadlineMinutes} min, ` +
+    `expiry sweep every ${config.expirySweepSeconds}s`);
 });
+
+const stopExpirySweep = startExpirySweep();
 
 for (const signal of ['SIGINT', 'SIGTERM']) {
   process.on(signal, () => {
     console.log(`[booking] ${signal}, shutting down`);
+    stopExpirySweep();
     server.close(async () => {
       await pool.end().catch(() => {});
       process.exit(0);

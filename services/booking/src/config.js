@@ -36,6 +36,10 @@ export const config = {
   // How long an accepted request waits for its DP before expiring.
   // Real: 1440 (1x24 hours). Demo: a few minutes, so the screencast is watchable.
   dpDeadlineMinutes: number('DP_DEADLINE_MINUTES', 1440),
+
+  // How often the expiry sweep looks for overdue deposits. The deadline is what
+  // matters; this only decides how soon after it the slot comes back.
+  expirySweepSeconds: number('EXPIRY_SWEEP_SECONDS', 30),
 };
 
 if (missing.length > 0) {

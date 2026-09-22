@@ -47,3 +47,33 @@ export async function createInvoice({ reference, purpose, payerId, payeeId, amou
 
   return res.json();
 }
+
+// POST /invoices/{id}/void. Used by the expiry sweep when a DP deadline passes.
+//
+// The contract is blunt about the race: "Paid and void are exclusive. If a
+// settlement landed first this returns 409 AlreadyPaid, and the caller must
+// wait for InvoicePaid rather than give the slot away." So a 409 is not an
+// error here -- it is payments telling us the client paid at the last second
+// and the slot is theirs. We report it and the sweep leaves the request alone.
+export async function voidInvoice(invoiceId) {
+  let res;
+  try {
+    res = await fetch(`${config.paymentsUrl}/invoices/${encodeURIComponent(invoiceId)}/void`, {
+      method: 'POST',
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+  } catch (err) {
+    throw new PaymentsUnavailable(`cannot reach payments at ${config.paymentsUrl}: ${err.message}`);
+  }
+
+  if (res.status === 409) return { alreadyPaid: true };
+  if (res.status >= 500 || res.status === 429) {
+    throw new PaymentsUnavailable(`payments returned ${res.status}`);
+  }
+  if (res.status !== 200) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`payments refused the void (${res.status}): ${body.slice(0, 200)}`);
+  }
+
+  return { alreadyPaid: false };
+}
