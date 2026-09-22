@@ -34,7 +34,12 @@ Every member owns one service and reviews the next one. Put the names in once th
 ## How to run
 
 Prerequisites: **Node.js 20+** (for `--env-file-if-exists` and a built-in `fetch`)
-and **PostgreSQL 14+**. Nothing else — no Docker, no global npm packages.
+and **PostgreSQL 14+** (verified on 17). Nothing else — no Docker, no global npm
+packages. On Windows, run the shell steps in **Git Bash**.
+
+> **`psql` is probably not on your PATH** if you installed PostgreSQL on Windows
+> with the standard installer. It lives in `C:\Program Files\PostgreSQL\<version>\bin`.
+> Add that to PATH first, or the next command will simply not be found.
 
 **1. Create the three databases and their roles.** Once, as a superuser:
 
@@ -42,9 +47,13 @@ and **PostgreSQL 14+**. Nothing else — no Docker, no global npm packages.
 psql -U postgres -f infra/db/bootstrap.sql
 ```
 
+> **This will ask for the `postgres` password and the prompt is easy to miss** —
+> it prints nothing until you answer, so a silent terminal here means it is
+> waiting for you, not hanging.
+
 That makes `booking_db`, `payments_db` and `studio_db`, each owned by its own
 login role, and revokes `CONNECT` from `PUBLIC` so one service's credentials are
-refused by its neighbours' databases. Prove it:
+refused by its neighbours' databases. It is safe to re-run. Prove it:
 
 ```bash
 bash infra/db/verify-isolation.sh      # expects 9/9
