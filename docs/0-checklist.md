@@ -76,7 +76,7 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | # | Item | Required by | Status | What's left |
 |---|---|---|---|---|
 | E1 | Two or three services plus a thin client, not four | B1 | ◐ | `booking` has code; `payments` and `studio` still READMEs only; no client yet |
-| E2 | `booking` service running | §5 | ◐ | Pricelist, windows, requests, accept, decline all verified. Only `/payment-notifications` and the expiry sweep left |
+| E2 | `booking` service running | §5 | ◐ | All contract routes implemented and verified against stubs. Only the DP expiry sweep left |
 | E3 | `payments` service running | §5 | ☐ | |
 | E4 | `studio` service running | §5 | ☐ | |
 | E5 | Thin client: `.http`, Postman, Bruno, or a CLI | B1 | ☐ | Nothing exists yet |
@@ -85,7 +85,7 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | E8 | No shared entity classes; dependency files show plumbing only | B3 | ◐ | booking depends on express + pg only; confirm once all three exist |
 | E9 | Hard rule as one conditional `UPDATE`, never read-then-write | Hard rule | ☑ | In `accept()`, [services/booking/src/requests.js](../services/booking/src/requests.js) |
 | E10 | Exactly-once settlement: unique `provider_ref` | Hard rule | ☐ | |
-| E11 | Idempotent receivers for InvoicePaid | Contracts | ☐ | |
+| E11 | Idempotent receivers for InvoicePaid | Contracts | ◐ | booking done and tested, including retry after a studio outage; studio's receiver is Asthar's |
 | E12 | Concurrency check: 20 parallel **accepts** on 3 slots → 3×200, 17×409 | Hard rule under load | ☑ | **Passes**: 3 accepted, 17 `SlotsFull`, 168ms |
 | E13 | Duplicate callback returns `applied: false` | Hard rule | ☐ | Step 8 of the demo script |
 | E14 | Demo script steps 1–14 pass end to end | §5 | ☐ | [4-build-plan.md](4-build-plan.md) |

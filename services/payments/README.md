@@ -1,4 +1,4 @@
-# payments
+    # payments
 
 **Owner:** _TBD_ · **Reviewer:** _TBD_ · **Contract:** [../../contracts/payments.openapi.yaml](../../contracts/payments.openapi.yaml)
 

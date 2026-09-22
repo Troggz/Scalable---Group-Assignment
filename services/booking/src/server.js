@@ -8,6 +8,7 @@ import { InvalidInput } from './http.js';
 import { pricelistRoutes } from './routes/pricelist.js';
 import { windowRoutes } from './routes/windows.js';
 import { requestRoutes } from './routes/requests.js';
+import { notificationRoutes } from './routes/notifications.js';
 
 const app = express();
 app.use(express.json({ limit: '128kb' }));
@@ -31,9 +32,7 @@ app.get('/health', async (_req, res) => {
 app.use(pricelistRoutes);
 app.use(windowRoutes);
 app.use(requestRoutes);
-
-// Still to implement, against contracts/booking.openapi.yaml:
-//   POST /payment-notifications            <- must be idempotent
+app.use(notificationRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
