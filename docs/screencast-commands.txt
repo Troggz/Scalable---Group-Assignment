@@ -1,0 +1,166 @@
+===============================================================================
+ OPENCOMM SCREENCAST - COPY/PASTE SHEET
+ 3 minutes. Order is fixed by the handout section 5.1:
+   1) main flow end to end, INCLUDING the hard-rule rejection
+   2) change one service, restart only it, flow still works, change visible
+ Delete this file after recording if you don't want it in the repo.
+===============================================================================
+
+
+-------------------------------------------------------------------------------
+ STEP 0 - BEFORE YOU HIT RECORD  (not on camera)
+-------------------------------------------------------------------------------
+
+Put the old message back so you have a "before" to change on camera.
+Run this from the repo root:
+
+git checkout -- services/booking/src/requests.js
+sed -i '167s/.*/        `All ${w[0].slot_count} slots in "${w[0].title}" are kept or taken`,/' services/booking/src/requests.js
+sed -i '168d' services/booking/src/requests.js
+
+Check it looks right (should be ONE line, no "awaiting DP"):
+
+sed -n '165,169p' services/booking/src/requests.js
+
+Now open FOUR terminals, all visible on screen, plus your editor on
+services/booking/src/requests.js
+
+  Terminal 1 (booking):    cd services/booking && npm start
+  Terminal 2 (payments):   cd services/payments && npm start
+  Terminal 3 (studio):     cd services/studio && npm start
+  Terminal 4 (commands):   stay in the repo root  <-- you paste into this one
+
+Let them run a minute or two before recording, so the uptime numbers are big.
+
+Start recording: Win+Alt+R
+
+
+-------------------------------------------------------------------------------
+ 0:00 - 0:15   SHOW ALL THREE ARE UP
+-------------------------------------------------------------------------------
+
+for p in 3001 3002 3003; do curl -s http://localhost:$p/health; echo; done
+
+SAY: "Three services, three separate databases. Note the uptime numbers -
+      we'll come back to them."
+
+
+-------------------------------------------------------------------------------
+ 0:15 - 1:20   THE MAIN FLOW, END TO END
+-------------------------------------------------------------------------------
+
+node client/flow.mjs
+
+SAY, as it scrolls:
+  step 3  - "Four clients request. Slots left is still three. A request
+             holds nothing - the artist decides."
+  step 4  - "She accepts three. Now slots left is zero."
+  step 5  - "The fourth accept is refused: 409 SlotsFull. THAT IS THE HARD
+             RULE." <-- the rejection the handout asks for
+  step 8  - "The same payment callback twice. Second one says applied false.
+             Paid exactly once."
+  step 9  - "Payments told booking, booking told studio. Nobody asked."
+  step 11 - "Final sent, but the hi-res file is withheld."
+  step 13 - "Balance paid, file released. 28 of 28 passing."
+
+
+-------------------------------------------------------------------------------
+ 1:20 - 1:40   THE HARD RULE UNDER LOAD
+-------------------------------------------------------------------------------
+
+node client/concurrency.mjs
+
+SAY: "Twenty accepts in flight at once against three slots. Exactly three
+      succeed, seventeen are refused, in under a tenth of a second."
+
+
+-------------------------------------------------------------------------------
+ 1:40 - 2:05   CHANGE ONE SERVICE  (do this in the editor, on camera)
+-------------------------------------------------------------------------------
+
+Open services/booking/src/requests.js, line 167. Replace that ONE line with
+these TWO lines:
+
+        `All ${w[0].slot_count} slots in "${w[0].title}" are kept or taken ` +
+        `(${w[0].kept} awaiting DP, ${w[0].taken} booked)`,
+
+SAY: "One service changes. Booking will now say how many of those slots are
+      still waiting on a deposit and might come back."
+
+
+-------------------------------------------------------------------------------
+ 2:05 - 2:20   RESTART ONLY BOOKING
+-------------------------------------------------------------------------------
+
+In TERMINAL 1 (booking) ONLY:   Ctrl+C    then    npm start
+
+DO NOT TOUCH terminals 2 and 3. Let the camera see them sitting there.
+
+SAY: "Restarting booking alone. I am not touching payments or studio."
+
+
+-------------------------------------------------------------------------------
+ 2:20 - 2:45   THE PROOF
+-------------------------------------------------------------------------------
+
+for p in 3001 3002 3003; do curl -s http://localhost:$p/health; echo; done
+
+SAY: "Booking's uptime reset to a few seconds. Payments and studio kept
+      counting straight through - they were never redeployed. A restart
+      would have put them back to zero."
+
+node client/concurrency.mjs
+
+SAY: "Same three and seventeen, and there's the new message: three awaiting
+      DP, zero booked. The change is live and the hard rule still holds."
+
+
+-------------------------------------------------------------------------------
+ 2:45 - 3:00   CLOSE
+-------------------------------------------------------------------------------
+
+SAY: "Three services, each owning its own database. One of them changed and
+      redeployed on its own while the other two kept serving, and the flow
+      is still correct."
+
+Stop recording: Win+Alt+R
+
+
+-------------------------------------------------------------------------------
+ AFTER RECORDING
+-------------------------------------------------------------------------------
+
+1. Put the real message back:
+
+git checkout -- services/booking/src/requests.js
+
+2. Upload the clip (YouTube unlisted, or Drive with link sharing on).
+
+3. Paste the URL into docs/report.md, front page, replacing:   _(link)_
+
+4. Rebuild the report PDF:
+
+node docs/build-report.mjs docs/report.md docs/_report.html
+
+   then open docs/_report.html in Chrome, Ctrl+P, Save as PDF, A4, no
+   headers/footers, save over docs/report.pdf - and delete _report.html.
+
+
+-------------------------------------------------------------------------------
+ IF SOMETHING GOES WRONG
+-------------------------------------------------------------------------------
+
+"fetch failed / ECONNREFUSED"
+    A service is not running. Check all three terminals, restart the dead one.
+
+"409 WindowNotOpen"
+    Shouldn't happen - the scripts create windows that open one minute ago.
+    If it does, your system clock is off.
+
+A service won't start, "EADDRINUSE"
+    An old copy is still holding the port:
+    powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 3001,3002,3003 -State Listen | Select-Object -ExpandProperty OwningProcess | Sort-Object -Unique | ForEach-Object { Stop-Process -Id $_ -Force }"
+    then start all three again.
+
+psql not found (only needed for the isolation check, not the screencast)
+    export PATH="$PATH:/c/Program Files/PostgreSQL/17/bin"
