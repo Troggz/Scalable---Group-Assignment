@@ -26,7 +26,7 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | A7 | One owner per service, each reviews another | B5 | ☑ | Thomas → `booking`, Ethan → `payments`, Asthar → `studio`; each reviews the next ([../README.md](../README.md)) |
 | A8 | Stack decided (language, framework, database) | §5 | ☑ | **Node.js + PostgreSQL**, one DB and one role per service |
 | A9 | Week 2 proposal submitted to LMS | Week 2, mandatory | ◐ | [proposal.pdf](proposal.pdf) complete except the four interviewee fields (name, rounds, platform/handle, two dates). Fill after 2026-09-22 and submit; app claim is first-come |
-| A10 | Outside person confirmed, interview + session booked | §2, §3.1 | ◐ | Eja confirmed and interviewed 2026-09-22; **the 90-minute session still needs booking** |
+| A10 | Outside person confirmed, interview + session booked | §2, §3.1 | ☑ | Eja: interview and 90-minute session both done 2026-09-22 |
 
 ## B. Step 1 — The app (15 pts)
 
@@ -45,9 +45,9 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | # | Item | Required by | Status | What's left |
 |---|---|---|---|---|
 | C1 | 20-minute interview conducted | §3.1 | ☑ | Eja, 2026-09-22, six questions answered in writing |
-| C2 | 90-minute event storming with the outside person | §3.1, App. B | ☐ | Agenda is written; session has not happened |
-| C3 | Board photo or export | §3.1 hand-in | ☐ | Photograph at every step, not just the end |
-| C4 | Typed list of 20+ events **from the session** | §3.1 hand-in | ☐ | The 30 candidate events are prep, explicitly not the hand-in |
+| C2 | 90-minute event storming with the outside person | §3.1, App. B | ☑ | Held 2026-09-22 with Eja; all three members compiled the board |
+| C3 | Board photo or export | §3.1 hand-in | ☑ | Board export in `screenshots/` |
+| C4 | Typed list of 20+ events **from the session** | §3.1 hand-in | ☑ | **24 events** off the wall, typed in [2-board.md](2-board.md) with actors, commands and rules |
 | C5 | Glossary, 12+ terms in the artist's own words | §3.2 | ☑ | **13 terms** in Eja's own words, leading [2-glossary.md](2-glossary.md); our own terms kept in a separate table below them |
 | C6 | Two terms that change meaning across the business | §3.2 | ☑ | **"fix"** (booked vs a small correction) and **"comm"** (the round vs the job), both from Eja's own words |
 | C7 | Four or more aggregate cards: identity, states, rules, hides | §3.3 | ☑ | Five cards in [2-aggregates.md](2-aggregates.md) |
@@ -100,12 +100,12 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 |---|---|---|---|---|
 | F1 | Report PDF, 8 pages max, front page with team and NIMs | §6 | ☐ | The docs are sources, not the report |
 | F2 | §1 The app | §6.1 | ◐ | Source ready |
-| F3 | §2 The domain, with the board photo | §6.2 | ☐ | Interview and glossary ready; blocked on C2–C4 (the board) |
+| F3 | §2 The domain, with the board photo | §6.2 | ◐ | Every source ready: interview, glossary, board, aggregates, contexts. Needs writing into the report |
 | F4 | §3 The boundaries | §6.3 | ◐ | Source ready; diagrams need exporting |
 | F5 | §4 The build, what runs and what does not | §6.4 | ☐ | |
 | F6 | §5.a Which Chapter 1 cost hit first, named incident | §6.5 | ◐ | Two incidents logged in [4-build-plan.md](4-build-plan.md); pick one and write it up |
 | F7 | §5.b Would a modular monolith have been better? | §6.5 | ☐ | Honest answer scores full marks |
-| F8 | §5.c What event storming changed about the design | §6.5 | ☐ | Blocked on C2 |
+| F8 | §5.c What event storming changed about the design | §6.5 | ◐ | Three gaps the board found and the build does not cover — [2-board.md](2-board.md) §reconciliation |
 | F9 | Screencast, 3 minutes, in the prescribed order | §5.1 | ☐ | Flow with the rejection, then one service restarted alone |
 | F10 | `docs/report.pdf` in the repo | §6 layout | ☐ | |
 | F11 | Submitted to LMS by end of Week 4, 23:59 WIB | §1 | ☐ | |

@@ -10,8 +10,9 @@ so after the session, go back and replace or confirm every draft term.
 | [proposal.md](proposal.md) | Week 2 one-page proposal | Draft: fill in names and the interviewee |
 | [1-app.md](1-app.md) | 1 The app (Step 1, items 1.a–1.e) | Draft |
 | [2-interview.md](2-interview.md) | 2 The domain: the 20-minute interview guide | Done — ran with Eja, 2026-09-22 |
-| [2-event-storming.md](2-event-storming.md) | 2 The domain: session agenda, candidate events, hot spots | Prep; **the session still hasn't happened** |
-| [2-run-sheet.md](2-run-sheet.md) | 2 The domain: what to actually do in the 90 minutes | Take this into the session |
+| [2-event-storming.md](2-event-storming.md) | 2 The domain: session agenda, candidate events, hot spots | Prep. The session ran 2026-09-22 — results in [2-board.md](2-board.md) |
+| [2-run-sheet.md](2-run-sheet.md) | 2 The domain: how the 90 minutes was run | Session done 2026-09-22 |
+| [2-board.md](2-board.md) | 2 The domain: the board, 24 events, and what it found the build does not do | The §3.1 hand-in |
 | [2-findings.md](2-findings.md) | 2 The domain: findings from the interview, C11 settled, scope guards | Real evidence from Eja |
 | [2-glossary.md](2-glossary.md) | 2 The domain: glossary and context-dependent terms | Done — 13 terms in Eja's words, plus both meaning-shifts |
 | [2-aggregates.md](2-aggregates.md) | 2 The domain: aggregate cards | Draft |
@@ -35,7 +36,7 @@ so after the session, go back and replace or confirm every draft term.
 | Pts | Criterion | Where we answer it | Done |
 |---|---|---|---|
 | 15 | App fits R1–R4; users, features, main flow, hard rule | 1-app.md | ☐ |
-| 15 | Event storming with the outside person; 20+ events; glossary with 2 context-dependent terms | 2-event-storming.md, 2-glossary.md, board photo | ☐ |
+| 15 | Event storming with the outside person; 20+ events; glossary with 2 context-dependent terms | [2-board.md](2-board.md), [2-glossary.md](2-glossary.md), board export | ☑ |
 | 15 | Aggregates with real rules; contexts drawn from the domain, not the tables | 2-aggregates.md, 2-contexts.md | ☐ |
 | 15 | Coupling table labelled correctly; one bad coupling found and fixed | 3-boundaries.md §3.2 | ☐ |
 | 10 | Cost-of-change test; contracts written before code; what each service hides | 3-boundaries.md §3.3–3.4, /contracts | ☐ |
