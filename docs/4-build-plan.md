@@ -84,8 +84,21 @@ Also: no shared `models/` or `entities/` package between services. Each service'
 | Time | Show |
 |---|---|
 | 0:00–1:40 | Demo script steps 2–13, including **409 SlotsFull** and **applied: false** on the duplicate callback |
-| 1:40–2:20 | Change one service. Suggestion: booking's `SlotsFull` message also says the window title. Restart **only booking**; the other two terminals stay up. |
-| 2:20–3:00 | Run steps 2–4 again and show the changed message. Point at payments and studio uptime (untouched). |
+| 1:40–2:20 | Change one service: booking's `SlotsFull` message gains `(N awaiting DP, N booked)`. Restart **only booking**; the other two terminals stay up. |
+| 2:20–3:00 | Run `client/concurrency.mjs` again, show the changed message, and point at `uptimeSeconds` on all three. |
+
+**Rehearsed 2026-09-22, and the proof is a number rather than an assertion.** `GET /health` returns
+`uptimeSeconds` per service. Across the restart it read:
+
+| Service | Before | After | |
+|---|---|---|---|
+| booking | 29 | **31** | reset — this is the one that restarted |
+| payments | 22 | **324** | kept counting |
+| studio | 14 | **317** | kept counting |
+
+A redeploy would have put payments and studio back near zero. They didn't move, so they were never touched — which
+is B4 ("change it, deploy it, leave the others running") demonstrated rather than claimed. The hard rule still passed
+after the change: 3 × 200 and 17 × 409 in 95ms.
 
 Bonus for the live demo: stop `studio`, pay a DP (booking answers 503 to payments), start `studio`, and watch
 payments' retry deliver the booking.

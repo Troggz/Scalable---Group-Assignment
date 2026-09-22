@@ -91,7 +91,7 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | E14 | Demo script steps 1–16 pass end to end | §5 | ☑ | `flow.mjs` 28/28, `concurrency.mjs` 3×200/17×409 in 152ms, `expiry.mjs` 9/9 |
 | E15 | Seed data (`rara`, `budi`, `sari`, `dimas`, `ayu`) | B6 | ☑ | No user table exists anywhere: an id travels in the request, and each client script sets up its own pricelist and window |
 | E16 | Root README "How to run", verified on a clean clone | B6 | ☑ | **Verified 2026-09-22**: fresh `git clone`, followed the README as written, `flow.mjs` 28/28 and `concurrency.mjs` 3×200/17×409. Two snags found and documented (psql not on PATH, silent password prompt) |
-| E17 | Change one service, restart only it, others stay up | B4 | ◐ | Studio stopped and restarted alone while booking and payments kept serving. Still to do on camera with a visible code change |
+| E17 | Change one service, restart only it, others stay up | B4 | ☑ | **Done 2026-09-22.** Changed booking's `SlotsFull` message, restarted booking alone. `uptimeSeconds` booking 29→31 (reset), payments 22→324, studio 14→317 (never restarted). Rule still holds: 3×200/17×409 |
 | E18 | Each owner commits their own service | B5, −10 | ☑ | Thomas → booking, Ethan → payments, Asthar → studio, visible in `git log` |
 
 ## F. Report, screencast, submission

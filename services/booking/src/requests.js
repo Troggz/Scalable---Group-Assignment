@@ -164,7 +164,8 @@ export async function accept(requestId, quoteIDR, { dpDeadlineMinutes, publicUrl
       }
       throw new Conflict(
         'SlotsFull',
-        `All ${w[0].slot_count} slots in "${w[0].title}" are kept or taken`,
+        `All ${w[0].slot_count} slots in "${w[0].title}" are kept or taken ` +
+        `(${w[0].kept} awaiting DP, ${w[0].taken} booked)`,
       );
     }
     // --------------------------------------------------------------------
