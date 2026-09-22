@@ -65,10 +65,27 @@ the session. Keep what the artist confirms, rename to their words, and drop what
 
 ## Hot spots to raise if they don't come up on their own
 
-- Is a slot kept at **request** time, at **accept** time, or only at **DP** time? Our draft keeps it at request time.
-  If the artist says "only when DP arrives", the hard rule moves to the payment step. Redraw before building.
-- One slot per client per window, or can one client take two slots for two characters?
-- How long is "1×24 jam" really? Is it counted from the request or from the artist's acceptance?
-- A DP arrives **after** the deadline and the slot has already gone to someone else. What happens?
-- Is a fix on the final a "revision"? Does it count against the limit?
-- Does the artist ever cancel a booked commission? What happens to the DP?
+**Settled already — do not re-ask as open questions.** The 20-minute interview answered these
+([2-findings.md](2-findings.md)), and the build now implements them. Raise them only to *check* the wall against what
+we have, and only after the flood:
+
+- **When is a slot kept?** Settled: at **accept**, not at request and not at DP. Booked at DP. Explicitly *not*
+  first-to-pay — Eja keeps it for whoever she accepted first.
+- **Is "full" the same as "closed"?** Settled: no. *"full itu soal slotnya, closed itu soal aku masih nerima comm
+  atau nggak."* She can close before full.
+- **Is the revision counter automatic?** Settled: no. She classifies each change by redraw effort, not message count.
+
+**Genuinely open — these are what the session is for.** Each one is a decision the code currently makes on its own
+authority, with nobody outside the team having confirmed it:
+
+| Hot spot | What the build assumes today |
+|---|---|
+| A DP lands **after** the deadline, once the slot is already released. What then? | The invoice is `VOID` and the money is **unmodelled**. This is a real gap, not a hypothetical |
+| Is the 1×24 jam counted from the client's request or from the artist's accept? | From accept |
+| Can the artist take back a slot after accepting? What happens to the DP? | Forbidden: `decline` works only before accept |
+| One slot per client per window, or two for two characters? | One, enforced by a partial unique index |
+| Does she ever close comms early, before the slots run out? | Supported |
+| Is **Quote Proposed → Quote Accepted** a real back-and-forth, or one artist action? | One action: accept carries the quote. [2-findings.md](2-findings.md) §4 flags this as worth watching for on the wall |
+
+**When two people argue about what a word means, stop and write both meanings down.** Both meaning-shifts we already
+have (*fix*, *comm*) came out of that kind of moment.

@@ -9,16 +9,18 @@ so after the session, go back and replace or confirm every draft term.
 | [0-checklist.md](0-checklist.md) | Every requirement, done and not done | Tick as you go |
 | [proposal.md](proposal.md) | Week 2 one-page proposal | Draft: fill in names and the interviewee |
 | [1-app.md](1-app.md) | 1 The app (Step 1, items 1.a–1.e) | Draft |
-| [2-interview.md](2-interview.md) | 2 The domain: the 20-minute interview guide | Ready to run; interview not done |
-| [2-event-storming.md](2-event-storming.md) | 2 The domain: session agenda, candidate events, hot spots | Prep; the session hasn't happened |
-| [2-findings.md](2-findings.md) | 2 The domain: provisional findings, C11 branches, scope guards | **PROVISIONAL**: confirm 2026-09-22 |
-| [2-glossary.md](2-glossary.md) | 2 The domain: glossary and context-dependent terms | **DRAFT**: confirm in interview |
+| [2-interview.md](2-interview.md) | 2 The domain: the 20-minute interview guide | Done — ran with Eja, 2026-09-22 |
+| [2-event-storming.md](2-event-storming.md) | 2 The domain: session agenda, candidate events, hot spots | Prep; **the session still hasn't happened** |
+| [2-run-sheet.md](2-run-sheet.md) | 2 The domain: what to actually do in the 90 minutes | Take this into the session |
+| [2-findings.md](2-findings.md) | 2 The domain: findings from the interview, C11 settled, scope guards | Real evidence from Eja |
+| [2-glossary.md](2-glossary.md) | 2 The domain: glossary and context-dependent terms | Done — 13 terms in Eja's words, plus both meaning-shifts |
 | [2-aggregates.md](2-aggregates.md) | 2 The domain: aggregate cards | Draft |
 | [2-contexts.md](2-contexts.md) | 2 The domain: bounded contexts | Draft |
-| [3-option-b.md](3-option-b.md) | 3 The boundaries: prepared contract revision if C11 resolves to "at DP" | Not applied; waiting on the interview |
+| [3-option-b.md](3-option-b.md) | 3 The boundaries: the contract revision we prepared in case C11 resolved to "at DP" | Never applied — Eja settled it at accept. Keep as evidence the domain decided the design |
 | [3-boundaries.md](3-boundaries.md) | 3 The boundaries: diagram, coupling, cost of change, what each service hides | Draft |
-| [4-build-plan.md](4-build-plan.md) | 4 The build: thin-build script, hard-rule enforcement, screencast plan, incident log | Plan |
-| [../contracts/](../contracts/) | Contracts (4.4) | v1 draft: commit before any code |
+| [4-build-plan.md](4-build-plan.md) | 4 The build: thin-build script, hard-rule enforcement, screencast plan, incident log | Built and passing; incident log started |
+| [../client/](../client/) | 4 The build: the thin client (B1) | `demo.http` plus three scripts |
+| [../contracts/](../contracts/) | Contracts (4.4) | v1, committed before any service code |
 
 ## Deadlines
 

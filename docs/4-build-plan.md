@@ -29,7 +29,9 @@ Seed data: artist `rara`; clients `budi`, `sari`, `dimas`, `ayu`.
 | 11 | studio `POST /commissions/{c}/final` | `AWAITING_BALANCE`, `remainderInvoiceId`, `balanceDueIDR: 175000`, no `finalFileUrl` | studio → payments |
 | 12 | payments `POST /provider/callbacks` for the pelunasan | 200 `applied: true` | |
 | 13 | studio `GET /commissions/{c}` | `COMPLETED`, `finalFileUrl` present | payments → studio |
-| *14* | *optional:* booking `POST /requests/{sari}/decline`, then ayu requests again | *200, then 201* | *A slot is released* |
+| 14 | booking `POST /requests/{ayu}/decline` (ayu is still SUBMITTED) | 200 `DECLINED`, `slotsLeft` unchanged | Declining frees nothing, because a request held nothing |
+| 15 | booking `POST /requests/{sari}/decline` (sari is ACCEPTED) | **409 `InvalidTransition`** | An artist cannot take back a kept slot by declining |
+| 16 | *(expiry)* accept with `DP_DEADLINE_MINUTES=0`, wait one sweep | request `EXPIRED`, `slotsLeft` back up, invoice `VOID` | **The only way a kept slot is released** |
 
 ## How the rules will be enforced (internal, not part of any contract)
 
@@ -55,6 +57,13 @@ only if a row actually changed. Void uses the same guard (`WHERE status='ISSUED'
 
 **Idempotent receivers (booking, studio).** InvoicePaid for a request that is already `BOOKED`, or a commission that is already `COMPLETED`,
 returns 200 and changes nothing. If booking can't reach studio, it answers 503, and payments retries later.
+
+**Releasing a kept slot (booking).** Only the DP deadline does this. `decline` applies to a SUBMITTED request,
+which held nothing, so it releases nothing — the contract says so in as many words. A slot kept by a client who
+then goes quiet comes back through the expiry sweep in `src/expiry.js`, which **voids the invoice first and
+releases the slot second**. That order matters: the contract makes paid and void exclusive, so a 409 `AlreadyPaid`
+is payments telling booking the money arrived after all, and the sweep then leaves the slot alone. Releasing first
+would hand away a slot the client had just paid for.
 
 ## B2 proof: each service owns its data
 
@@ -87,4 +96,5 @@ Write it down the day it happens: what broke, which Chapter 1 cost it was, and h
 
 | Date | What happened | Chapter 1 cost | Time lost |
 |---|---|---|---|
-| | | | |
+| 2026-09-22 | First run of all three services together. Steps 1–9 passed first time; steps 10–13 failed only because the demo script guessed field names (`fileUrl`) that the studio contract does not have (`sketchUrl`, `previewUrl` + `finalFileUrl`). Reading the contract fixed it. | Coordination — the contract was right and the caller was wrong, which is the cheap direction for this to fail | ~15 min |
+| 2026-09-22 | Step 14 of this plan was stale: it declined an **accepted** request and expected a slot back. That was the pre-interview model, where a request held the slot. Booking correctly returned 409. Exposed a real gap — **nothing released a kept slot at all**, because the DP expiry sweep had never been built. | Correctness — the domain finding (slot kept at accept) had been implemented in `accept()` but its consequence for expiry was never followed through | ~40 min to find and build |

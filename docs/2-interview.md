@@ -1,5 +1,9 @@
 # 2. The domain: the 20-minute interview
 
+> **Done — run with Eja on 2026-09-22.** Her answers are in [2-findings.md](2-findings.md) and her vocabulary is in
+> [2-glossary.md](2-glossary.md). This file stays as the record of how the interview was conducted, and because the
+> same rules apply again at the [90-minute session](2-event-storming.md), which has not happened yet.
+
 The outside person should be an **artist who has run at least one open comm with slots**. A frequent commissioner is
 the second-best choice. They give this interview first, then join the [90-minute session](2-event-storming.md).
 
@@ -128,8 +132,9 @@ The graded artefact is **12+ terms in their words**, so collect them during the 
   Indonesian or English, before it is understood.
 - When a word appears that you don't know, **ask them to define it and write the definition in their sentence**:
   *"You said 'di-keep' — what does that mean exactly?"* Their sentence is the glossary entry. Ours isn't.
-- Do **not** correct their terminology to match [2-glossary.md](2-glossary.md). That file is a draft hypothesis. Where it
-  disagrees with them, they are right and it is wrong.
+- Do **not** correct their terminology to match [2-glossary.md](2-glossary.md). Where it disagrees with them, they are
+  right and it is wrong. That is exactly what happened: the terms Eja used now lead that file, and our drafted
+  equivalents were moved into a separate table below them.
 
 ## Hunting the two meaning-shifts
 

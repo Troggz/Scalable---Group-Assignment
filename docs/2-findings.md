@@ -4,9 +4,7 @@
 > quoted below in the original; this is the first real evidence in this file and it overrides everything the earlier
 > synthesis documents guessed at.
 >
-> Two caveats the source itself flags. The Q5 load figures are labelled *"MOCK PLACEHOLDER — ganti dengan angka asli
-> dari Eja sebelum dipakai sebagai bukti"*, so they are **not yet usable as evidence**. And the 90-minute event-storming
-> session has still not happened, so the board export §3.1 asks for does not exist.
+> The 90-minute event-storming session has still not happened, so the board export §3.1 asks for does not exist.
 
 ---
 
@@ -75,6 +73,22 @@ Straight from the transcript, spelled as she spells them. These replace our draf
 | **antrean / queue** | "urutan commission yang sudah booked" | Studio |
 | **release slot** | "slot yang tadinya di-keep dibuka lagi" | Booking |
 | **waitlist** | "orang yang menunggu kalau slot kembali tersedia" | (out of scope) |
+| **baru chat / ngechat** | *"pas orang baru ngechat atau nanya itu belum aku anggap dapet slot"* | Booking — names the stage **before** a request |
+| **comm** | *"buka comm"* / *"close comm"* = the round; *"aku accept commnya"* = one client's job | Booking **and** Studio — see §3 |
+
+That is **13 terms**, past the 12 §3.2 asks for, and every one of them is a phrase she used rather than one we
+translated for her.
+
+The last two were sitting in the transcript unrecorded, and both earn their place:
+
+**baru chat** is the most load-bearing word in this project. It names the stage where someone has messaged but has
+nothing — *"kadang baru nanya harga terus ilang 😭"* — and it is the whole reason the hard rule lives in `accept()`
+rather than at the request. Without this term the design reads as an arbitrary choice; with it, it reads as the
+artist's own distinction. It is also a boundary marker: the stage is real to her and deliberately **outside** our
+system, because a DM is not something we model.
+
+**comm** has to be in the glossary because §3.2 wants the meaning-shifting terms to *be* glossary terms, and it was
+only written up in §3 below. See there for the split.
 
 **full and closed are different, and she was precise about it:** *"full itu soal slotnya, closed itu soal aku masih
 nerima comm atau nggak."* She can close before full — *"kalau tiba-tiba sibuk atau ngerasa workload-nya udah
@@ -102,10 +116,10 @@ is exactly the kind of find the handout calls the most useful thing in the exerc
 **2. "comm"** — the round versus the job. *"buka comm"* and *"close comm"* are the window; *"aku accept **commnya**"*
 is one client's artwork. Same word, one meaning in Booking and another in Studio.
 
-## 4. Domain events (27) — provisional
+## 4. Domain events (27) — from the interview
 
-For the §3.1 hand-in we need 20+ **from the session**. This is the expected shape, to compare against what the wall
-actually produces:
+The flow as Eja described it. The §3.1 hand-in has to be 20+ events **from the wall**, so this is the shape to compare
+against what the session actually produces:
 
 ```
 Pricelist Updated -> Commission Window Created -> Commissions Opened
@@ -141,7 +155,7 @@ The source document drifts into a marketplace. These are rejected on purpose, an
 
 Keeping the four contexts we have (Booking, Pricelist, Payments, Studio) and three services.
 
-## 6. Confirmed by this walkthrough (no change needed)
+## 6. Confirmed by the interview (no change needed)
 
 - **Exactly-once settlement.** Providers resend callbacks; a transaction id must count once. Matches our
   `UNIQUE (provider_ref)` design.
@@ -160,17 +174,14 @@ it in our own words once we have hit a real distributed-systems cost during the 
 
 ---
 
-## Tomorrow's 20 minutes: confirm, don't rediscover
+## What the interview settled, and what is still open
 
-Work the ★ questions in [2-interview.md](2-interview.md) as written — do **not** read this file's answers to them, or
-you will lead the witness and lose the glossary. Use this list only afterwards, to check coverage.
-
-| # | Must come out of the session | Why |
+| # | Item | Status |
 |---|---|---|
-| 1 | The C11 answer, plus the two-people-in-the-24h-window follow-up | Picks Option A or B; blocks the build |
-| 2 | Both meaning-shifts, in their words, recorded | Graded explicitly in §3.2 |
-| 3 | 12+ glossary terms as they say them | Graded |
-| 4 | Real load numbers — followers, time-to-full, messages in the first hour | Report §1.e; replaces invented figures |
-| 5 | One oversell story and one payment-confusion story | The two hard rules, told as incidents |
-| 6 | The minor-fix vs revision line | Decides whether the revision counter is automatic |
-| 7 | **Board photo / export** | A hand-in. Cannot be reconstructed afterwards |
+| 1 | The C11 answer, plus the two-people-in-the-24h-window follow-up | ☑ Settled: kept at accept, and not first-to-pay |
+| 2 | Both meaning-shifts, in her words | ☑ *fix* and *comm* — §3 above |
+| 3 | 12+ glossary terms as she says them | ☑ 13 — §2 above. Still to merge into [2-glossary.md](2-glossary.md) |
+| 4 | Load numbers — reach, time-to-full, enquiries per round | ☑ In [1-app.md](1-app.md) §1.e |
+| 5 | An oversell story and a payment-confusion story | ☑ The two-at-once near-miss, quoted in §1 |
+| 6 | The minor-fix vs revision line | ☑ Redraw effort, not message count — the counter cannot be automatic |
+| 7 | **Board photo / export, and 20+ events from the wall** | ☐ **The session has not happened.** See [2-run-sheet.md](2-run-sheet.md) |

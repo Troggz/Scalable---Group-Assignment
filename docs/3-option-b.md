@@ -1,10 +1,11 @@
 # 3. Option B: move the race to the payment step
 
-> **Not applied.** This is a prepared revision, to be executed only if a real artist confirms the provisional C11
-> answer in [2-findings.md](2-findings.md) — that a slot becomes theirs **at DP**, not at request.
+> **Never applied — kept as a record of the road not taken.** This was the revision prepared in case a slot turned
+> out to become the client's **at DP** rather than at accept.
 >
-> If they confirm, applying this is about twenty minutes of edits to one contract and two aggregate cards. Still
-> before any service code, so the "contracts before code" evidence (D9, G5) is unaffected.
+> Eja settled it the other way ([2-findings.md](2-findings.md) §1): the slot is kept **at accept**, and she
+> deliberately avoids a payment race — *"bukan siapa yang transfer paling cepet"*. So this option is dead, and the
+> hard rule lives in `accept()`. Worth keeping in the report as evidence that the domain decided the design.
 
 ## What changes, in one sentence
 
