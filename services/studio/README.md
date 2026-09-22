@@ -1,6 +1,6 @@
 # studio
 
-**Owner:** _TBD_ · **Reviewer:** _TBD_ · **Contract:** [../../contracts/studio.openapi.yaml](../../contracts/studio.openapi.yaml)
+**Owner:** Asthar · **Reviewer:** Ethan · **Contract:** [../../contracts/studio.openapi.yaml](../../contracts/studio.openapi.yaml)
 
 Making the artwork and handing it over. Owns **Commission**: queue, sketch, revisions, final, and releasing the
 hi-res link once nothing is left to pay.
@@ -18,7 +18,18 @@ It boots with only its database available.
 
 ## Run
 
-_Not written yet. Code comes after `/contracts` is committed._
+```bash
+cp .env.example .env
+npm install
+npm run migrate
+npm start                     # http://localhost:3003/health
+```
+
+Needs PostgreSQL running and `infra/db/bootstrap.sql` applied once (already done;
+your role and database exist). Copy the shape of `services/booking/` — its
+`package.json`, `src/config.js`, `src/db.js` and `src/server.js` are generic, and
+`src/http.js` has the validators and the `{error, message}` helpers. Change the
+port and the `DATABASE_URL`, then build the endpoints in your contract.
 
 ## Must not
 
