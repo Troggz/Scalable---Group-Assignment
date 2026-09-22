@@ -106,7 +106,7 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | F6 | §5.a Which Chapter 1 cost hit first, named incident | §6.5 | ☑ | Losing the transaction across a boundary, 2026-09-22 integration run |
 | F7 | §5.b Would a modular monolith have been better? | §6.5 | ☑ | Yes, and what would make us split |
 | F8 | §5.c What event storming changed about the design | §6.5 | ☑ | Hard rule moved, three gaps found, the revision counter, and the boundaries holding |
-| F9 | Screencast, 3 minutes, in the prescribed order | §5.1 | ◐ | Recorded: `Screencast Video Explanation.mp4` in the repo root (19 MB). **Still to upload somewhere streamable and put that URL in the report** |
+| F9 | Screencast, 3 minutes, in the prescribed order | §5.1 | ☑ | Recorded and uploaded; the Drive link is on the report front page, and the file is in the repo root as a fallback |
 | F10 | `docs/report.pdf` in the repo | §6 layout | ☑ | Rebuild with `node docs/build-report.mjs docs/report.md docs/_report.html`, then print to PDF |
 | F11 | Submitted to LMS by end of Week 4, 23:59 WIB | §1 | ☐ | |
 | F12 | Week 5 lab demo, 7 minutes live + 8 of questions | §1 | ☐ | |
