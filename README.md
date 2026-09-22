@@ -28,17 +28,66 @@ Every member owns one service and reviews the next one. Put the names in once th
 /docs/                design docs that feed the report (start at docs/README.md)
 /contracts/           one contract per service, committed BEFORE any service code
 /services/<name>/     one folder per service, each with its own README
+/client/              the thin client: the main flow and nothing else
 ```
 
 ## How to run
 
-_Not written yet. Service code comes after the contracts are committed._ This section will list:
+Prerequisites: **Node.js 20+** (for `--env-file-if-exists` and a built-in `fetch`)
+and **PostgreSQL 14+**. Nothing else — no Docker, no global npm packages.
 
-1. Prerequisites (runtime and PostgreSQL version).
-2. How to create the three databases and their users (a script in each service folder).
-3. What to start and on which port. Design goal: **any start order works**, because a service needs only its own database to boot.
-4. How to load seed data (artist `rara`, clients `budi`, `sari`, `dimas`, `ayu`).
-5. The demo script for the main flow (see [docs/4-build-plan.md](docs/4-build-plan.md)).
+**1. Create the three databases and their roles.** Once, as a superuser:
+
+```bash
+psql -U postgres -f infra/db/bootstrap.sql
+```
+
+That makes `booking_db`, `payments_db` and `studio_db`, each owned by its own
+login role, and revokes `CONNECT` from `PUBLIC` so one service's credentials are
+refused by its neighbours' databases. Prove it:
+
+```bash
+bash infra/db/verify-isolation.sh      # expects 9/9
+```
+
+**2. Configure and migrate each service.** In `services/booking`, `services/payments`
+and `services/studio`:
+
+```bash
+cp .env.example .env     # local dev passwords, deliberately not secret
+npm ci
+npm run migrate
+```
+
+**3. Start them, in any order,** each in its own terminal:
+
+```bash
+cd services/booking  && npm start     # :3001
+cd services/payments && npm start     # :3002
+cd services/studio   && npm start     # :3003
+```
+
+Any start order works, and any one of them can be restarted alone, because a
+service needs only its own database to boot. It learns about its neighbours from
+a URL in `.env` and discovers they are down by getting a connection refused —
+never by failing to start. `GET /health` on each port says who is up.
+
+**4. Run the flow.** There is no seed step: an artist or client is just an id
+inside a request (`rara`, `budi`, `sari`, `dimas`, `ayu`), so the client creates
+what it needs against an empty database.
+
+```bash
+node client/flow.mjs           # the main flow, steps 0-15, asserted
+node client/concurrency.mjs    # the hard rule under load: 3 x 200, 17 x 409
+```
+
+For the demo itself, open [client/demo.http](client/demo.http) in VS Code with the
+REST Client extension and send the blocks in order. See [client/README.md](client/README.md)
+for what each step proves, and for the two steps that need a restarted service.
+
+**5. The outage test** (worth showing live). Stop `studio`, then pay a DP. Booking
+books the request, fails to hand it to studio, and answers 503; payments keeps
+retrying. Start studio again and the commission lands on its own.
 
 ## Ground rules (these carry grade deductions)
 
