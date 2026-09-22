@@ -55,8 +55,8 @@ Rp175.000. The client pays, the hi-res link is released, and the commission is *
 **Hard rule.** *An artist never gets more commissions in a window than the slots they opened, however many clients are
 competing for the last one.* Related: a payment is applied exactly once, even if the provider's callback arrives twice.
 
-**Load.** Load arrives in spikes. Eja, the artist we interviewed, reaches about a thousand people with one post; her
-last five-slot round drew fifteen to twenty serious enquiries and filled inside thirty to sixty minutes. She has
+**Load.** Load arrives in spikes. Eja, the artist we interviewed, reaches about a thousand people with one post; his
+last five-slot round drew fifteen to twenty serious enquiries and filled inside thirty to sixty minutes. He has
 already had two clients arrive together for the last slot, and handles it today by telling one to wait. A second,
 smaller burst follows as accepted clients pay their DP and the provider sends callbacks, sometimes more than once.
 
@@ -69,13 +69,13 @@ links.
 # 2 The domain
 
 We interviewed **Eja**, an illustrator who runs open comms in batches of about five slots, on 22 September 2026, and
-ran a 90-minute event-storming session with her the same day. The board export is in `screenshots/`.
+ran a 90-minute event-storming session with him the same day. The board export is in `screenshots/`.
 
 ## 2.1 Ubiquitous language
 
-Thirteen terms in her words; the full glossary is in `docs/2-glossary.md`.
+Thirteen terms in his words; the full glossary is in `docs/2-glossary.md`.
 
-| Term | How she said it | Context |
+| Term | How he said it | Context |
 |---|---|---|
 | **baru chat / ngechat** | *"pas orang baru ngechat atau nanya itu belum aku anggap dapet slot"* | Booking (boundary) |
 | **di-keep** | *"slot sementara ditahan setelah artist accept"* | Booking |
@@ -99,7 +99,7 @@ sketches. That gap is the service boundary.
 
 ## 2.2 Event storming
 
-![The board from the 90-minute session with Eja, 22 September 2026. Yellow: actors. Blue: commands. Orange: the 24 domain events. Pink: open questions. Green: the resolved hotspot and her business rules.](../screenshots/C3 - board.png)
+![The board from the 90-minute session with Eja, 22 September 2026. Yellow: actors. Blue: commands. Orange: the 24 domain events. Pink: open questions. Green: the resolved hotspot and his business rules.](../screenshots/C3 - board.png)
 
 The session produced **24 domain events** in four columns, typed up in full in `docs/2-board.md`. Abridged:
 
@@ -116,9 +116,9 @@ Payments and Studio — the same four bounded contexts we had drawn beforehand, 
 
 > *"baru chat = belum dapet slot. aku bilang yes = slot di-keep. baru fix booked pas DP masuk."* — Eja
 
-Three distinct moments, and the middle one consumes capacity. She was also explicit that it is **not** first-to-pay:
-*"bukan siapa yang transfer paling cepet"*. She keeps the slot for whoever she accepted first, because telling two
-people to pay creates a problem she then has to clean up.
+Three distinct moments, and the middle one consumes capacity. He was also explicit that it is **not** first-to-pay:
+*"bukan siapa yang transfer paling cepet"*. He keeps the slot for whoever he accepted first, because telling two
+people to pay creates a problem he then has to clean up.
 
 ## 2.3 Aggregates
 
@@ -315,15 +315,15 @@ ran *after* the code was working. The handout puts it before, and that is the ri
 its remaining value was whether it could still contradict us. It did, three times, and we recorded those as
 contradictions rather than talking them away. **The interview moved the hard rule.** Our draft consumed a slot at
 *request* time. Eja was precise that a message is not a slot — *"baru chat = belum dapet slot"* — and that a slot is
-kept when she accepts, booked when the DP lands. That moved the conditional `UPDATE` out of the request handler into
+kept when he accepts, booked when the DP lands. That moved the conditional `UPDATE` out of the request handler into
 `accept()`, made `POST /windows/{id}/requests` impossible to refuse for capacity, and gave `accept` a `409 SlotsFull`
-it did not have. It also killed a prepared alternative in which payment consumed the slot first-come; she deliberately
+it did not have. It also killed a prepared alternative in which payment consumed the slot first-come; he deliberately
 avoids a payment race, *"kalau dua-duanya aku suruh bayar terus dua-duanya transfer malah aku yang bikin masalah
 sendiri"*. We kept that dead design in `docs/3-option-b.md` as evidence the domain decided it. **The board found three
 things we do not do** — request cancelled by the client, payment failed, and additional fee requested — none of which
 appeared in the thirty candidate events we prepared beforehand. Each is a small change to one service, which we take
 as a sign the boundaries are drawn in the right places even where behaviour is missing. **One word changed the
-design:** *revisi* and *fix* are different to her, and the line is how much must be redrawn, not how many messages
+design:** *revisi* and *fix* are different to him, and the line is how much must be redrawn, not how many messages
 arrive, so the revision counter cannot be automatic. We had modelled an automatic counter and it was wrong. **And the
-boundaries held:** the four columns her events sorted into — Pricelist, Booking, Payments, Studio — are exactly the
+boundaries held:** the four columns his events sorted into — Pricelist, Booking, Payments, Studio — are exactly the
 four contexts we had drawn before the session.

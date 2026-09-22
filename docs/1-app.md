@@ -57,9 +57,9 @@ notifications by email or push · a mobile app.
 are competing for the last one. *(Related rule: a payment is applied exactly once, even if the provider's callback
 arrives twice.)*
 
-**Load:** load arrives in spikes. Eja, the artist we interviewed, reaches about a thousand people with one post; her
+**Load:** load arrives in spikes. Eja, the artist we interviewed, reaches about a thousand people with one post; his
 last five-slot round drew fifteen to twenty serious enquiries and was full inside thirty to sixty minutes. The
-collisions are few but real — she has already had two clients arrive together for the last slot, and handles it today
+collisions are few but real — he has already had two clients arrive together for the last slot, and handles it today
 by telling one of them to wait. Everyone who misses out needs a quick, clean "slots full". A
 second, smaller burst follows as accepted clients pay their DP before the 1×24-hour deadline and the provider sends its
 callbacks, sometimes more than once.

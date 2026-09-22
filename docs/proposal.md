@@ -37,8 +37,8 @@ It crosses three areas of the business: booking, payments, and the studio.
 
 **An artist never gets more commissions in a window than the slots they opened, however many clients are competing
 for the last one.** The load is bursty and self-inflicted: the artist we interviewed reaches around a thousand people
-with one post, and her last five-slot round drew fifteen to twenty serious enquiries and filled inside thirty to sixty
-minutes. She has already had two clients arrive together for the last slot. A related rule: a payment is applied
+with one post, and his last five-slot round drew fifteen to twenty serious enquiries and filled inside thirty to sixty
+minutes. He has already had two clients arrive together for the last slot. A related rule: a payment is applied
 exactly once, even if the payment provider's callback arrives twice.
 
 ## Why this is not a marketplace (R4)

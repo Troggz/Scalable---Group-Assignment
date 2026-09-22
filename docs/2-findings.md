@@ -1,6 +1,6 @@
 # 2. The domain: findings
 
-> **Answered by Eja, 2026-09-22.** An artist who runs open comms answered the six questions directly. Her words are
+> **Answered by Eja, 2026-09-22.** An artist who runs open comms answered the six questions directly. His words are
 > quoted below in the original; this is the first real evidence in this file and it overrides everything the earlier
 > synthesis documents guessed at.
 >
@@ -29,7 +29,7 @@
 > aku kasih slot + deadline DP, menurutku ya itu hak dia selama masih di dalam deadline."  — Eja
 
 This kills **Option B** outright. The artist deliberately avoids creating a payment race, because a race is a problem
-she then has to clean up: *"kalau dua-duanya aku suruh bayar terus dua-duanya transfer malah aku yang bikin masalah
+he then has to clean up: *"kalau dua-duanya aku suruh bayar terus dua-duanya transfer malah aku yang bikin masalah
 sendiri wkwk."*
 
 ### What this means for our contracts
@@ -50,17 +50,17 @@ The conditional `UPDATE` moves from the request insert to the accept handler. `W
 Two real races survive, and both are worth demonstrating:
 
 1. **Concurrent accepts.** Eja's own near-miss: *"dua orang chat hampir barengan pas tinggal satu slot, jadi aku harus
-   bilang ke yang satu kalau slot terakhir lagi di-keep orang lain dulu."* She handles this by hand today; the system
+   bilang ke yang satu kalau slot terakhir lagi di-keep orang lain dulu."* He handles this by hand today; the system
    must handle it atomically. Demo step 5 becomes **20 parallel accepts on 3 slots → 3 × 200, 17 × 409 SlotsFull**.
 2. **Payment versus expiry.** The sweep releases a slot at the deadline while a DP may be landing on the same request.
    Getting this wrong either oversells or loses a paid slot. Our CommissionRequest card already names it.
 
 ## 2. Terms in Eja's own words
 
-Straight from the transcript, spelled as she spells them. These replace our drafted equivalents in
+Straight from the transcript, spelled as he spells them. These replace our drafted equivalents in
 [2-glossary.md](2-glossary.md) wherever the two disagree.
 
-| Term | Her definition | Where it lives |
+| Term | His definition | Where it lives |
 |---|---|---|
 | **di-keep** | "slot sementara ditahan setelah artist accept" | Booking |
 | **DP masuk** | "deposit sudah diterima" | Payments |
@@ -76,34 +76,34 @@ Straight from the transcript, spelled as she spells them. These replace our draf
 | **baru chat / ngechat** | *"pas orang baru ngechat atau nanya itu belum aku anggap dapet slot"* | Booking — names the stage **before** a request |
 | **comm** | *"buka comm"* / *"close comm"* = the round; *"aku accept commnya"* = one client's job | Booking **and** Studio — see §3 |
 
-That is **13 terms**, past the 12 §3.2 asks for, and every one of them is a phrase she used rather than one we
-translated for her.
+That is **13 terms**, past the 12 §3.2 asks for, and every one of them is a phrase he used rather than one we
+translated for him.
 
 The last two were sitting in the transcript unrecorded, and both earn their place:
 
 **baru chat** is the most load-bearing word in this project. It names the stage where someone has messaged but has
 nothing — *"kadang baru nanya harga terus ilang 😭"* — and it is the whole reason the hard rule lives in `accept()`
 rather than at the request. Without this term the design reads as an arbitrary choice; with it, it reads as the
-artist's own distinction. It is also a boundary marker: the stage is real to her and deliberately **outside** our
+artist's own distinction. It is also a boundary marker: the stage is real to him and deliberately **outside** our
 system, because a DM is not something we model.
 
 **comm** has to be in the glossary because §3.2 wants the meaning-shifting terms to *be* glossary terms, and it was
 only written up in §3 below. See there for the split.
 
-**full and closed are different, and she was precise about it:** *"full itu soal slotnya, closed itu soal aku masih
-nerima comm atau nggak."* She can close before full — *"kalau tiba-tiba sibuk atau ngerasa workload-nya udah
+**full and closed are different, and he was precise about it:** *"full itu soal slotnya, closed itu soal aku masih
+nerima comm atau nggak."* He can close before full — *"kalau tiba-tiba sibuk atau ngerasa workload-nya udah
 kebanyakan"* — which confirms our draft glossary was right to separate them.
 
 **The revision line is about redraw effort, not message count:** *"aku lebih liat seberapa banyak yang harus digambar
 ulang, bukan cuma jumlah chat 'tolong ubah ini'."* A pose change, an outfit change or a big added object is revisi; a
-wrong eye colour or a detail she misread from the brief is not. That means the revision counter **cannot** be
+wrong eye colour or a detail he misread from the brief is not. That means the revision counter **cannot** be
 automatic — the artist has to classify each change, which is a real requirement we had not modelled.
 
 ## 3. The two meaning-shifts (§3.2 requires two)
 
 Both come out of Eja's own transcript, which is what makes them usable.
 
-**1. "fix" — the good one.** She uses the same word for two unrelated things in two different parts of the business:
+**1. "fix" — the good one.** He uses the same word for two unrelated things in two different parts of the business:
 
 | Where | What "fix" means |
 |---|---|
@@ -179,8 +179,8 @@ it in our own words once we have hit a real distributed-systems cost during the 
 | # | Item | Status |
 |---|---|---|
 | 1 | The C11 answer, plus the two-people-in-the-24h-window follow-up | ☑ Settled: kept at accept, and not first-to-pay |
-| 2 | Both meaning-shifts, in her words | ☑ *fix* and *comm* — §3 above |
-| 3 | 12+ glossary terms as she says them | ☑ 13 — §2 above. Still to merge into [2-glossary.md](2-glossary.md) |
+| 2 | Both meaning-shifts, in his words | ☑ *fix* and *comm* — §3 above |
+| 3 | 12+ glossary terms as he says them | ☑ 13 — §2 above. Still to merge into [2-glossary.md](2-glossary.md) |
 | 4 | Load numbers — reach, time-to-full, enquiries per round | ☑ In [1-app.md](1-app.md) §1.e |
 | 5 | An oversell story and a payment-confusion story | ☑ The two-at-once near-miss, quoted in §1 |
 | 6 | The minor-fix vs revision line | ☑ Redraw effort, not message count — the counter cannot be automatic |

@@ -121,4 +121,4 @@ description of what the artist sees (the money side triggers it), not a contradi
 
 **"Manage slots / waitlist"** appeared as a command. The waitlist stays out of scope, as
 [1-app.md](1-app.md) already records, and Eja's own glossary entry for it describes people waiting outside the
-system rather than a feature she runs.
+system rather than a feature he runs.

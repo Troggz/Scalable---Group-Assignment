@@ -1,6 +1,6 @@
 # 2. The domain: the 20-minute interview
 
-> **Done — run with Eja on 2026-09-22.** Her answers are in [2-findings.md](2-findings.md) and her vocabulary is in
+> **Done — run with Eja on 2026-09-22.** His answers are in [2-findings.md](2-findings.md) and his vocabulary is in
 > [2-glossary.md](2-glossary.md). This file stays as the record of how the interview was conducted, and because the
 > same rules apply again at the [90-minute session](2-event-storming.md), which has not happened yet.
 

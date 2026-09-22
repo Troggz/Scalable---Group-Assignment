@@ -1,13 +1,13 @@
 # 2. The domain: ubiquitous language
 
 > **Confirmed against Eja's interview, 2026-09-22.** §3.2 asks for at least twelve terms in the words the outside
-> person actually used. The first table is that set — **thirteen terms, each one a phrase she said**, transcribed from
-> [2-findings.md](2-findings.md) §2 and spelled the way she spells them. The second table holds the terms our model
-> needs that she did not name herself, kept separate on purpose so the graded set stays honest.
+> person actually used. The first table is that set — **thirteen terms, each one a phrase he said**, transcribed from
+> [2-findings.md](2-findings.md) §2 and spelled the way he spells them. The second table holds the terms our model
+> needs that he did not name himself, kept separate on purpose so the graded set stays honest.
 
 ## Terms in the artist's own words (13)
 
-| # | Term | How she said it | Meaning | Context |
+| # | Term | How he said it | Meaning | Context |
 |---|---|---|---|---|
 | 1 | **baru chat / ngechat** | *"pas orang baru ngechat atau nanya itu belum aku anggap dapet slot"* | Someone has messaged or asked a price and has **nothing yet**. The stage before a request, and deliberately outside our system | Booking (boundary) |
 | 2 | **comm** | *"buka comm"*, *"close comm"*, *"aku accept commnya"* | The round, or one client's job. See the meaning shift below | Booking / Studio |
@@ -17,25 +17,25 @@
 | 6 | **DP masuk** | *"deposit sudah diterima"* | The deposit has landed. This is what turns a kept slot into a taken one | Payments |
 | 7 | **fix booked** | *"commission sudah confirmed"* | Settled — the commission is really happening | Booking |
 | 8 | **full** | *"semua slot yang aku buka udah keisi / lagi di-keep orang"* | No slot is free right now | Booking |
-| 9 | **closed** | *"aku memang udah ga nerima request lagi"* | She is not taking requests at all any more — a different thing from *full* | Booking |
-| 10 | **antrean / queue** | *"urutan commission yang sudah booked"* | The order she works booked commissions in | Studio |
+| 9 | **closed** | *"aku memang udah ga nerima request lagi"* | He is not taking requests at all any more — a different thing from *full* | Booking |
+| 10 | **antrean / queue** | *"urutan commission yang sudah booked"* | The order he works booked commissions in | Studio |
 | 11 | **revisi** | *"yang ngubah gambar lumayan banyak"* | A change big enough to count against the limit, judged by redraw effort | Studio |
 | 12 | **fix** | *"koreksi kecil yang tidak dianggap revisi penuh"* | A small correction that does **not** count as a revision | Studio |
-| 13 | **waitlist** | *"orang yang menunggu kalau slot kembali tersedia"* | People waiting for a slot to come back. Named by her, **out of scope** for us | (excluded) |
+| 13 | **waitlist** | *"orang yang menunggu kalau slot kembali tersedia"* | People waiting for a slot to come back. Named by him, **out of scope** for us | (excluded) |
 
 Two of these carry design decisions that would otherwise look arbitrary:
 
-- **baru chat** is why the hard rule lives in `accept()` and not at the request. A message is not a slot, in her words
+- **baru chat** is why the hard rule lives in `accept()` and not at the request. A message is not a slot, in his words
   before it was in our code.
-- **full vs closed** — *"full itu soal slotnya, closed itu soal aku masih nerima comm atau nggak."* She can close
+- **full vs closed** — *"full itu soal slotnya, closed itu soal aku masih nerima comm atau nggak."* He can close
   before full, *"kalau tiba-tiba sibuk atau ngerasa workload-nya udah kebanyakan"*. Capacity and availability are two
   different states, so `Window.status` derives both.
-- **revisi vs fix** means the revision counter **cannot be automatic**. She classifies each change by how much has to
+- **revisi vs fix** means the revision counter **cannot be automatic**. He classifies each change by how much has to
   be redrawn, not by how many messages arrive.
 
-## Terms our model needs that she did not name
+## Terms our model needs that he did not name
 
-Ours, not hers. Listed separately so the graded set above is not padded.
+Ours, not his. Listed separately so the graded set above is not padded.
 
 | Term | Meaning | Context |
 |---|---|---|
@@ -54,7 +54,7 @@ Ours, not hers. Listed separately so the graded set above is not padded.
 
 ## Terms that change meaning across the business
 
-§3.2 asks for two. Both of these are hers, which is what makes them usable — see [2-findings.md](2-findings.md) §3.
+§3.2 asks for two. Both of these are his, which is what makes them usable — see [2-findings.md](2-findings.md) §3.
 
 ### 1. "fix"
 

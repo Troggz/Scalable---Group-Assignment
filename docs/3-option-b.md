@@ -3,7 +3,7 @@
 > **Never applied — kept as a record of the road not taken.** This was the revision prepared in case a slot turned
 > out to become the client's **at DP** rather than at accept.
 >
-> Eja settled it the other way ([2-findings.md](2-findings.md) §1): the slot is kept **at accept**, and she
+> Eja settled it the other way ([2-findings.md](2-findings.md) §1): the slot is kept **at accept**, and he
 > deliberately avoids a payment race — *"bukan siapa yang transfer paling cepet"*. So this option is dead, and the
 > hard rule lives in `accept()`. Worth keeping in the report as evidence that the domain decided the design.
 
