@@ -81,7 +81,7 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | E4 | `studio` service running | §5 | ☑ | Verified in the 2026-09-22 integration run |
 | E5 | Thin client: `.http`, Postman, Bruno, or a CLI | B1 | ☑ | [client/demo.http](../client/demo.http) for the demo, plus three scripts for the steps a request-at-a-time client cannot drive |
 | E6 | Own database and own login role per service | B2 | ☑ | [infra/db/bootstrap.sql](../infra/db/bootstrap.sql) applied; three roles, three databases |
-| E7 | Proof: a neighbour's credentials are refused | B2 | ☑ | `verify-isolation.sh` passes 9/9. **Screenshot the output for report §4** |
+| E7 | Proof: a neighbour's credentials are refused | B2 | ☑ | `verify-isolation.sh` passes 9/9; screenshot captured for report §4 |
 | E8 | No shared entity classes; dependency files show plumbing only | B3 | ☑ | All three depend on express + pg only, and on nothing shared |
 | E9 | Hard rule as one conditional `UPDATE`, never read-then-write | Hard rule | ☑ | In `accept()`, [services/booking/src/requests.js](../services/booking/src/requests.js) |
 | E10 | Exactly-once settlement: unique `provider_ref` | Hard rule | ☑ | `settlements.provider_ref` PK; duplicate callback returns `applied: false` |
