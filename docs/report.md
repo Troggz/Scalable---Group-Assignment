@@ -10,7 +10,8 @@
 | Ryan Ethan Halim | 24/536718/PA/22765 | `payments` | `studio` |
 | Muhammad Asthar Bin Rizwan | 24/546649/PA/23208 | `studio` | `booking` |
 
-**Repository:** `https://github.com/Troggz/Scalable---Group-Assignment` · **Screencast:** _(link)_
+**Repository:** `https://github.com/Troggz/Scalable---Group-Assignment`
+**Screencast (3 min):** `Screencast Video Explanation.mp4`, in the repository root · _(streaming link)_
 
 **The app.** Independent illustrators take commissions in rounds called *open comm*. OpenComm is the booking desk for
 one round, and it never oversells the artist's slots.
