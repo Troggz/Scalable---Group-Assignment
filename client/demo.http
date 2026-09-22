@@ -1,0 +1,355 @@
+###############################################################################
+# OpenComm -- the thin client.
+#
+# The main flow end to end, in the order docs/4-build-plan.md lays it out, and
+# nothing else. No styling, no login, no admin panel: this file IS the client
+# (requirement B1).
+#
+# Run it with the REST Client extension for VS Code. Each block below has a
+# "Send Request" link above it. Send them top to bottom -- later requests read
+# ids out of earlier responses, so skipping one breaks the ones after it.
+#
+# Start all three services first; see the root README. Steps marked ** are the
+# ones the screencast has to show.
+###############################################################################
+
+@booking  = http://localhost:3001
+@payments = http://localhost:3002
+@studio   = http://localhost:3003
+
+# Seed data. There is no user table anywhere -- an artist or client is just an
+# id that travels in the request, which is why no service needs the others'.
+@artist = rara
+@budi   = budi
+@sari   = sari
+@dimas  = dimas
+@ayu    = ayu
+
+
+###############################################################################
+# 0. Is everything up?
+###############################################################################
+
+### booking
+GET {{booking}}/health
+
+### payments
+GET {{payments}}/health
+
+### studio
+GET {{studio}}/health
+
+
+###############################################################################
+# 1. The artist publishes a pricelist.
+###############################################################################
+
+# @name pricelist
+PUT {{booking}}/artists/{{artist}}/pricelist
+Content-Type: application/json
+
+{
+  "tiers": [
+    { "code": "HALF_BODY", "name": "Half body", "startFromIDR": 250000 },
+    { "code": "FULL_BODY", "name": "Full body", "startFromIDR": 400000 }
+  ],
+  "addOns": [
+    { "code": "BG", "name": "Background", "priceIDR": 50000 }
+  ],
+  "depositPercent": 50,
+  "revisionLimit": 2
+}
+
+
+###############################################################################
+# 2. The artist opens a window with three slots.
+#
+# The window takes a COPY of the pricelist. Publishing a new one tomorrow does
+# not move the prices under a client who already requested.
+###############################################################################
+
+# The dates are relative to right now. A fixed opensAt would eventually drift
+# into the future, the window would read SCHEDULED, and step 3 would fail with
+# 409 WindowNotOpen -- which looks like a bug and is not.
+# @name openWindow
+POST {{booking}}/windows
+Content-Type: application/json
+
+{
+  "artistId": "{{artist}}",
+  "title": "October open comm",
+  "slotCount": 3,
+  "opensAt": "{{$datetime iso8601 -1 h}}",
+  "closesAt": "{{$datetime iso8601 1 M}}"
+}
+
+@windowId = {{openWindow.response.body.$.windowId}}
+
+
+###############################################################################
+# 3. Four clients request a slot. Expect 201 four times -- and slotsLeft still 3.
+#
+# A request holds nothing. Eja: "baru chat = belum dapet slot."
+###############################################################################
+
+# @name budiRequest
+POST {{booking}}/windows/{{windowId}}/requests
+Content-Type: application/json
+
+{
+  "clientId": "{{budi}}",
+  "tier": "HALF_BODY",
+  "addOns": ["BG"],
+  "brief": "Half body, dark background, holding a cat.",
+  "referenceLinks": ["https://example.com/ref/budi-1.png"]
+}
+
+@budiRequestId = {{budiRequest.response.body.$.requestId}}
+
+### sari
+# @name sariRequest
+POST {{booking}}/windows/{{windowId}}/requests
+Content-Type: application/json
+
+{ "clientId": "{{sari}}", "tier": "HALF_BODY", "addOns": ["BG"], "brief": "Half body, dark background." }
+
+@sariRequestId = {{sariRequest.response.body.$.requestId}}
+
+### dimas
+# @name dimasRequest
+POST {{booking}}/windows/{{windowId}}/requests
+Content-Type: application/json
+
+{ "clientId": "{{dimas}}", "tier": "HALF_BODY", "brief": "Half body, plain background." }
+
+@dimasRequestId = {{dimasRequest.response.body.$.requestId}}
+
+### ayu -- the fourth, and there are only three slots
+# @name ayuRequest
+POST {{booking}}/windows/{{windowId}}/requests
+Content-Type: application/json
+
+{ "clientId": "{{ayu}}", "tier": "FULL_BODY", "brief": "Full body, standing pose." }
+
+@ayuRequestId = {{ayuRequest.response.body.$.requestId}}
+
+### ** slotsLeft must still be 3: four requests have consumed nothing
+GET {{booking}}/windows/{{windowId}}
+
+
+###############################################################################
+# 4. The artist accepts three. Each keeps a slot and issues a DP invoice.
+#
+# Booking calls payments here. The quote (350.000 = 300.000 list + the artist's
+# own adjustment) is the artist's; the deposit is 50% of it, rounded up by
+# booking to the nearest Rp1.000 -- a rule that appears in no contract.
+###############################################################################
+
+# @name acceptBudi
+POST {{booking}}/requests/{{budiRequestId}}/accept
+Content-Type: application/json
+
+{ "quoteIDR": 350000 }
+
+@budiInvoiceId = {{acceptBudi.response.body.$.depositInvoiceId}}
+
+### sari
+POST {{booking}}/requests/{{sariRequestId}}/accept
+Content-Type: application/json
+
+{ "quoteIDR": 350000 }
+
+### dimas
+POST {{booking}}/requests/{{dimasRequestId}}/accept
+Content-Type: application/json
+
+{ "quoteIDR": 350000 }
+
+### ** slotsLeft is now 0, and the window reads FULL
+GET {{booking}}/windows/{{windowId}}
+
+
+###############################################################################
+# 5. ** THE HARD RULE. Accepting ayu must fail with 409 SlotsFull.
+#
+# An artist never gets more commissions in a window than the slots they opened.
+###############################################################################
+
+POST {{booking}}/requests/{{ayuRequestId}}/accept
+Content-Type: application/json
+
+{ "quoteIDR": 450000 }
+
+
+###############################################################################
+# 6. The hard rule under load.
+#
+# Not expressible in this file: it needs 20 accepts in flight at once, which a
+# request-at-a-time client cannot do. Run the script instead:
+#
+#     node client/concurrency.mjs
+#
+# Expect exactly 3 x 200 and 17 x 409 on a fresh 3-slot window.
+###############################################################################
+
+
+###############################################################################
+# 7. Budi pays the DP. The provider calls payments back.
+#
+# In production the provider sends this. Here we send it by hand, which is the
+# whole reason payments keeps `providerRef`.
+###############################################################################
+
+# @name settleBudiDP
+POST {{payments}}/provider/callbacks
+Content-Type: application/json
+
+{
+  "providerRef": "PROV-DEMO-DP-0001",
+  "invoiceId": "{{budiInvoiceId}}",
+  "amountIDR": 175000,
+  "status": "SETTLED"
+}
+
+
+###############################################################################
+# 8. ** EXACTLY ONCE. The identical callback again.
+#
+# Providers really do deliver twice. Expect 200 with "applied": false -- the
+# money is not counted twice and no second slot is consumed.
+###############################################################################
+
+POST {{payments}}/provider/callbacks
+Content-Type: application/json
+
+{
+  "providerRef": "PROV-DEMO-DP-0001",
+  "invoiceId": "{{budiInvoiceId}}",
+  "amountIDR": 175000,
+  "status": "SETTLED"
+}
+
+
+###############################################################################
+# 9. Budi's request is now BOOKED, and studio has the job.
+#
+# The chain that just ran without anyone asking for it:
+#   payments --InvoicePaid--> booking --CommissionBooked--> studio
+###############################################################################
+
+# @name budiBooked
+GET {{booking}}/requests/{{budiRequestId}}
+
+@commissionId = {{budiBooked.response.body.$.commissionId}}
+
+### the artist's queue in studio
+GET {{studio}}/artists/{{artist}}/queue
+
+
+###############################################################################
+# 10. Sketch, then the client approves it.
+###############################################################################
+
+POST {{studio}}/commissions/{{commissionId}}/sketch
+Content-Type: application/json
+
+{ "sketchUrl": "https://files.example/sketch-1.png" }
+
+### optionally, ask for a revision instead (from SKETCH_REVIEW, max 2 here)
+# POST {{studio}}/commissions/{{commissionId}}/sketch/revisions
+# Content-Type: application/json
+#
+# { "notes": "Can the cat be on the other side?" }
+
+### client approves -> IN_PROGRESS
+POST {{studio}}/commissions/{{commissionId}}/sketch/approve
+Content-Type: application/json
+
+{}
+
+
+###############################################################################
+# 11. ** The artist sends the final. The hi-res file is WITHHELD.
+#
+# Expect AWAITING_BALANCE, a remainderInvoiceId, balanceDueIDR 175000 -- and no
+# finalFileUrl in the response. Studio called payments to raise the pelunasan.
+###############################################################################
+
+# @name sendFinal
+POST {{studio}}/commissions/{{commissionId}}/final
+Content-Type: application/json
+
+{
+  "previewUrl": "https://files.example/preview-watermarked.png",
+  "finalFileUrl": "https://files.example/final-hires.png"
+}
+
+@remainderInvoiceId = {{sendFinal.response.body.$.remainderInvoiceId}}
+
+### the invoice studio raised
+GET {{payments}}/invoices/{{remainderInvoiceId}}
+
+
+###############################################################################
+# 12. Budi pays the rest (pelunasan).
+###############################################################################
+
+POST {{payments}}/provider/callbacks
+Content-Type: application/json
+
+{
+  "providerRef": "PROV-DEMO-BAL-0001",
+  "invoiceId": "{{remainderInvoiceId}}",
+  "amountIDR": 175000,
+  "status": "SETTLED"
+}
+
+
+###############################################################################
+# 13. ** COMPLETED, and finalFileUrl is finally there.
+#
+# payments --InvoicePaid--> studio released the file. Nobody asked it to.
+###############################################################################
+
+GET {{studio}}/commissions/{{commissionId}}
+
+
+###############################################################################
+# 14. Declining frees nothing, because nothing was held.
+#
+# ayu is still SUBMITTED. Expect 200 DECLINED -- and slotsLeft unchanged.
+###############################################################################
+
+POST {{booking}}/requests/{{ayuRequestId}}/decline
+Content-Type: application/json
+
+{ "reason": "Not my style, sorry!" }
+
+### slotsLeft is the same as before the decline
+GET {{booking}}/windows/{{windowId}}
+
+
+###############################################################################
+# 15. An artist cannot take back a slot they already kept.
+#
+# sari is ACCEPTED and holding a slot. Expect 409 InvalidTransition. The only
+# thing that releases a kept slot is the DP deadline -- see step 16.
+###############################################################################
+
+POST {{booking}}/requests/{{sariRequestId}}/decline
+Content-Type: application/json
+
+{ "reason": "changed my mind" }
+
+
+###############################################################################
+# 16. The DP deadline releases a kept slot.
+#
+# Needs booking restarted with DP_DEADLINE_MINUTES=0 and EXPIRY_SWEEP_SECONDS=3,
+# so run it from the script rather than here:
+#
+#     node client/expiry.mjs
+#
+# It shows the sweep void the unpaid invoice first and release the slot second,
+# and shows a last-second payment keep its slot.
+###############################################################################
