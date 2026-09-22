@@ -1,6 +1,6 @@
 # booking
 
-**Owner:** _TBD_ · **Reviewer:** _TBD_ · **Contract:** [../../contracts/booking.openapi.yaml](../../contracts/booking.openapi.yaml)
+**Owner:** Thomas · **Reviewer:** Asthar · **Contract:** [../../contracts/booking.openapi.yaml](../../contracts/booking.openapi.yaml)
 
 Who gets a slot in this round. Owns **CommissionWindow**, **CommissionRequest**, and the **Pricelist** module.
 Enforces the hard rule: kept + taken slots never exceed `slotCount`.
@@ -20,7 +20,15 @@ It boots with only its database available. Payments and studio may be down at st
 
 ## Run
 
-_Not written yet. Code comes after `/contracts` is committed._
+```bash
+cp .env.example .env          # local dev values, already correct for a default Postgres
+npm install
+npm start                     # http://localhost:3001/health
+```
+
+Needs PostgreSQL running and `infra/db/bootstrap.sql` applied once. The service
+starts even when the database is down -- `/health` reports `database: "down"`
+until it is up, so any start order works (requirement B4).
 
 ## Must not
 

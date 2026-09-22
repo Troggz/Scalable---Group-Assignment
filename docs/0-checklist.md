@@ -54,7 +54,7 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | C8 | One aggregate carries the hard rule | §3.3 | ☑ | CommissionWindow |
 | C9 | Three to five bounded contexts, each aggregate in exactly one | §3.4 | ☑ | Four contexts in [2-contexts.md](2-contexts.md) |
 | C10 | Contexts are business activities, not tables | §3.4 quick check | ☑ | Booking, Pricelist, Payments, Studio |
-| C11 | Resolve the hot spot: is a slot kept at request, accept, or DP? | §3.1 | ◐ | Provisional answer **at DP** ([2-findings.md](2-findings.md)). Still **blocks the build** until a real artist confirms; if it holds, Option B moves the race to the payment step and booking’s contract changes |
+| C11 | Resolve the hot spot: is a slot kept at request, accept, or DP? | §3.1 | ◐ | Provisional answer **reservation counts toward capacity** (i.e. current design holds; narrowed to "at request or at accept?") ([2-findings.md](2-findings.md)). Still **blocks the build** until a real artist confirms; if it holds, Option B moves the race to the payment step and booking’s contract changes |
 
 ## D. Step 3 — The boundaries (15 + 10 pts)
 

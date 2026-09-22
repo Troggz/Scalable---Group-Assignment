@@ -4,7 +4,7 @@
 > [2-interview.md](2-interview.md), not from a real artist. The source document says so itself. It is a **hypothesis sheet**:
 > it tells us what to expect and what to test, and it is not the §3.1 hand-in.
 >
-> **Confirm with a real artist on 2026-09-22.** After that session, tick the Confirm column, rewrite anything they
+> **Still to confirm with a real artist.** After that session, tick the Confirm column, rewrite anything they
 > contradict, and delete this banner.
 
 The point of writing it down now is that the real interview stops being a discovery exercise and becomes a
@@ -12,7 +12,7 @@ twenty-minute confirm-or-correct pass, which is a far better use of an artist's 
 
 ---
 
-## 1. The hot spot (C11) — provisional answer: **at DP**
+## 1. The hot spot (C11) — provisional: **unpaid reservations count toward capacity** (see revision below)
 
 Asked *"at what point is the slot definitely theirs?"*, the answer was **"When I receive the DP"**, with a temporary
 reservation of about 24 hours beforehand, and the reservation created **after the artist accepts**, not when the
@@ -47,7 +47,13 @@ clients paying concurrently: a real race, driven by external payment callbacks, 
 Option B needs no refund logic — the losing payment is handled the way the source document suggests: *payment received
 after the slot is gone → do not create a commission → flag for artist review*.
 
-**Leaning B**, conditional on tomorrow. Contracts stay untouched until then.
+**Revised 2026-09-22 — leaning A, i.e. no change.** A second synthesis document (§37) states the invariant as
+*booked **and reserved** slots never exceed capacity*, with reservations expiring, and defines RESERVED as
+*"the client has claimed it or the artist accepted their request, but the DP has not yet been received"*.
+
+That is our existing invariant, `kept + taken <= slotCount`, not Option B. Unpaid capacity is held and expires —
+which is what our design already does. The open question narrows to **where the reservation begins: at request or
+at accept?** Option B stays prepared but unused; see [3-option-b.md](3-option-b.md).
 
 ### The question that decides it
 
@@ -87,7 +93,7 @@ The pricing example was concrete: full body advertised from Rp400k, but armour, 
 background take the agreed price to Rp725k. **Existing commissions keep their agreed price when the pricelist
 changes** — which is exactly the snapshot rule already in our CommissionWindow card.
 
-⚠ These only count when a real artist says them. Get both on the recording tomorrow.
+⚠ These only count when a real artist says them. Get both on the recording.
 
 ## 4. Domain events (27) — provisional
 
@@ -122,6 +128,8 @@ The source document drifts into a marketplace. These are rejected on purpose, an
 | Discovery: search, style/budget filters, ratings, artist cards, portfolios | **R4** forbids marketplaces; already excluded by name in [1-app.md](1-app.md) |
 | Six bounded contexts (adds Discovery, Messaging, Delivery) | Assignment allows 3–5 contexts, and **more than three services is −5** |
 | A 16-item MVP | Item 1.c caps the feature list at **ten**; we have exactly ten |
+| §37 waitlist: slot offers, claim timers, scheduled openings, "notify me" | **A waitlist is already in our deliberately-left-out list** ([1-app.md](1-app.md)), as are push/email notifications. Adding it breaks the ten-feature cap and needs a context we have no service for |
+| §21–22 artist and client dashboards | Presentation, not domain. The thin build is a `.http` collection (B1) |
 | Artist / Profile / Portfolio aggregates | Same discovery creep, one layer down |
 
 Keeping the four contexts we have (Booking, Pricelist, Payments, Studio) and three services.
