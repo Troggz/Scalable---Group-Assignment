@@ -38,7 +38,7 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | B4 | 1.d Main flow as a numbered sequence | 1.d, R3 | ☑ | Crosses booking, payments, studio |
 | B5 | 1.e Hard rule in one sentence + two on load | 1.e, R2 | ☑ | |
 | B6 | Not a marketplace, no ML or image processing | R4 | ☑ | Argued in [proposal.md](proposal.md) |
-| B7 | Section 1 copied into the report | §6.1 | ☐ | |
+| B7 | Section 1 copied into the report | §6.1 | ☑ | [report.md](report.md) §1 |
 
 ## C. Step 2 — The domain (15 pts)
 
@@ -61,7 +61,7 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 | # | Item | Required by | Status | What's left |
 |---|---|---|---|---|
 | D1 | Which contexts become services, which stay modules | §4.1 | ☑ | Three services, Pricelist as a module |
-| D2 | One diagram: services, aggregates, every call | §4.1 | ◐ | Mermaid in [3-boundaries.md](3-boundaries.md); export to PNG for the PDF |
+| D2 | One diagram: services, aggregates, every call | §4.1 | ☑ | Mermaid in [3-boundaries.md](3-boundaries.md); redrawn as text in the report so no export is needed |
 | D3 | Three Chapter 1 properties per service | §4.1 | ☑ | Table in [3-boundaries.md](3-boundaries.md) |
 | D4 | Coupling table, one row per call, labelled from Appendix A | §4.2 | ☑ | Six rows, all Domain |
 | D5 | One sentence of justification per row | §4.2 | ☑ | |
@@ -98,16 +98,16 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 
 | # | Item | Required by | Status | What's left |
 |---|---|---|---|---|
-| F1 | Report PDF, 8 pages max, front page with team and NIMs | §6 | ☐ | The docs are sources, not the report |
-| F2 | §1 The app | §6.1 | ◐ | Source ready |
-| F3 | §2 The domain, with the board photo | §6.2 | ◐ | Every source ready: interview, glossary, board, aggregates, contexts. Needs writing into the report |
-| F4 | §3 The boundaries | §6.3 | ◐ | Source ready; diagrams need exporting |
-| F5 | §4 The build, what runs and what does not | §6.4 | ☐ | |
-| F6 | §5.a Which Chapter 1 cost hit first, named incident | §6.5 | ◐ | Two incidents logged in [4-build-plan.md](4-build-plan.md); pick one and write it up |
-| F7 | §5.b Would a modular monolith have been better? | §6.5 | ☐ | Honest answer scores full marks |
-| F8 | §5.c What event storming changed about the design | §6.5 | ◐ | Three gaps the board found and the build does not cover — [2-board.md](2-board.md) §reconciliation |
+| F1 | Report PDF, 8 pages max, front page with team and NIMs | §6 | ☑ | **7 pages**, front page with all three names and NIMs |
+| F2 | §1 The app | §6.1 | ☑ | |
+| F3 | §2 The domain, with the board photo | §6.2 | ☑ | Glossary, 24 events, board photo embedded, aggregates, contexts |
+| F4 | §3 The boundaries | §6.3 | ☑ | Diagram redrawn as text so it needs no export; coupling table, both fixes, cost-of-change, what each hides |
+| F5 | §4 The build, what runs and what does not | §6.4 | ☑ | Evidence table with real numbers; the three board events we do not implement |
+| F6 | §5.a Which Chapter 1 cost hit first, named incident | §6.5 | ☑ | Losing the transaction across a boundary, 2026-09-22 integration run |
+| F7 | §5.b Would a modular monolith have been better? | §6.5 | ☑ | Yes, and what would make us split |
+| F8 | §5.c What event storming changed about the design | §6.5 | ☑ | Hard rule moved, three gaps found, the revision counter, and the boundaries holding |
 | F9 | Screencast, 3 minutes, in the prescribed order | §5.1 | ☐ | Flow with the rejection, then one service restarted alone |
-| F10 | `docs/report.pdf` in the repo | §6 layout | ☐ | |
+| F10 | `docs/report.pdf` in the repo | §6 layout | ☑ | Rebuild with `node docs/build-report.mjs docs/report.md docs/_report.html`, then print to PDF |
 | F11 | Submitted to LMS by end of Week 4, 23:59 WIB | §1 | ☐ | |
 | F12 | Week 5 lab demo, 7 minutes live + 8 of questions | §1 | ☐ | |
 
