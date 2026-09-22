@@ -44,17 +44,17 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 
 | # | Item | Required by | Status | What's left |
 |---|---|---|---|---|
-| C1 | 20-minute interview conducted | §3.1 | ☐ | Guide is written in [2-event-storming.md](2-event-storming.md) |
+| C1 | 20-minute interview conducted | §3.1 | ☑ | Eja, 2026-09-22, six questions answered in writing |
 | C2 | 90-minute event storming with the outside person | §3.1, App. B | ☐ | Agenda is written; session has not happened |
 | C3 | Board photo or export | §3.1 hand-in | ☐ | Photograph at every step, not just the end |
 | C4 | Typed list of 20+ events **from the session** | §3.1 hand-in | ☐ | The 30 candidate events are prep, explicitly not the hand-in |
-| C5 | Glossary, 12+ terms in the artist's own words | §3.2 | ◐ | 21 terms in [2-glossary.md](2-glossary.md), none ticked Confirmed |
-| C6 | Two terms that change meaning across the business | §3.2 | ◐ | "Comm" and "price" drafted, plus two backups; unconfirmed |
+| C5 | Glossary, 12+ terms in the artist's own words | §3.2 | ◐ | 11 terms captured verbatim from Eja in [2-findings.md](2-findings.md); still to merge into [2-glossary.md](2-glossary.md) |
+| C6 | Two terms that change meaning across the business | §3.2 | ☑ | **"fix"** (booked vs a small correction) and **"comm"** (the round vs the job), both from Eja's own words |
 | C7 | Four or more aggregate cards: identity, states, rules, hides | §3.3 | ☑ | Five cards in [2-aggregates.md](2-aggregates.md) |
 | C8 | One aggregate carries the hard rule | §3.3 | ☑ | CommissionWindow |
 | C9 | Three to five bounded contexts, each aggregate in exactly one | §3.4 | ☑ | Four contexts in [2-contexts.md](2-contexts.md) |
 | C10 | Contexts are business activities, not tables | §3.4 quick check | ☑ | Booking, Pricelist, Payments, Studio |
-| C11 | Resolve the hot spot: is a slot kept at request, accept, or DP? | §3.1 | ◐ | Provisional answer **reservation counts toward capacity** (i.e. current design holds; narrowed to "at request or at accept?") ([2-findings.md](2-findings.md)). Still **blocks the build** until a real artist confirms; if it holds, Option B moves the race to the payment step and booking’s contract changes |
+| C11 | Resolve the hot spot: is a slot kept at request, accept, or DP? | §3.1 | ☑ | **Answered by Eja: kept at accept, booked at DP, and explicitly not first-to-pay.** Contracts need the Option C change ([2-findings.md](2-findings.md)) |
 
 ## D. Step 3 — The boundaries (15 + 10 pts)
 
@@ -75,18 +75,18 @@ Every requirement from the handout, with where it lives and what is left. Tick a
 
 | # | Item | Required by | Status | What's left |
 |---|---|---|---|---|
-| E1 | Two or three services plus a thin client, not four | B1 | ◐ | Three service folders exist, but hold only READMEs |
-| E2 | `booking` service running | §5 | ☐ | |
+| E1 | Two or three services plus a thin client, not four | B1 | ◐ | `booking` has code; `payments` and `studio` still READMEs only; no client yet |
+| E2 | `booking` service running | §5 | ◐ | Pricelist, windows, requests, accept, decline all verified. Only `/payment-notifications` and the expiry sweep left |
 | E3 | `payments` service running | §5 | ☐ | |
 | E4 | `studio` service running | §5 | ☐ | |
 | E5 | Thin client: `.http`, Postman, Bruno, or a CLI | B1 | ☐ | Nothing exists yet |
-| E6 | Own database and own login role per service | B2 | ☐ | SQL drafted in [4-build-plan.md](4-build-plan.md) |
-| E7 | Proof: a neighbour's credentials are refused | B2 | ☐ | `psql -U booking_user -d payments_db` must fail |
-| E8 | No shared entity classes; dependency files show plumbing only | B3 | ☐ | |
-| E9 | Hard rule as one conditional `UPDATE`, never read-then-write | Hard rule | ☐ | The read-then-write version passes the demo and fails E12 |
+| E6 | Own database and own login role per service | B2 | ☑ | [infra/db/bootstrap.sql](../infra/db/bootstrap.sql) applied; three roles, three databases |
+| E7 | Proof: a neighbour's credentials are refused | B2 | ☑ | `verify-isolation.sh` passes 9/9. **Screenshot the output for report §4** |
+| E8 | No shared entity classes; dependency files show plumbing only | B3 | ◐ | booking depends on express + pg only; confirm once all three exist |
+| E9 | Hard rule as one conditional `UPDATE`, never read-then-write | Hard rule | ☑ | In `accept()`, [services/booking/src/requests.js](../services/booking/src/requests.js) |
 | E10 | Exactly-once settlement: unique `provider_ref` | Hard rule | ☐ | |
 | E11 | Idempotent receivers for InvoicePaid | Contracts | ☐ | |
-| E12 | Concurrency check: 20 parallel requests on 3 slots → 3×201, 17×409 | Hard rule under load | ☐ | Step 5 of the demo script |
+| E12 | Concurrency check: 20 parallel **accepts** on 3 slots → 3×200, 17×409 | Hard rule under load | ☑ | **Passes**: 3 accepted, 17 `SlotsFull`, 168ms |
 | E13 | Duplicate callback returns `applied: false` | Hard rule | ☐ | Step 8 of the demo script |
 | E14 | Demo script steps 1–14 pass end to end | §5 | ☐ | [4-build-plan.md](4-build-plan.md) |
 | E15 | Seed data (`rara`, `budi`, `sari`, `dimas`, `ayu`) | B6 | ☐ | |

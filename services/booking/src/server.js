@@ -7,6 +7,7 @@ import { pool, ping } from './db.js';
 import { InvalidInput } from './http.js';
 import { pricelistRoutes } from './routes/pricelist.js';
 import { windowRoutes } from './routes/windows.js';
+import { requestRoutes } from './routes/requests.js';
 
 const app = express();
 app.use(express.json({ limit: '128kb' }));
@@ -29,12 +30,9 @@ app.get('/health', async (_req, res) => {
 
 app.use(pricelistRoutes);
 app.use(windowRoutes);
+app.use(requestRoutes);
 
 // Still to implement, against contracts/booking.openapi.yaml:
-//   POST /windows/{windowId}/requests      <- the hard rule lives behind this
-//   GET  /requests/{requestId}
-//   POST /requests/{requestId}/accept
-//   POST /requests/{requestId}/decline
 //   POST /payment-notifications            <- must be idempotent
 
 app.use((req, res) => {
@@ -54,9 +52,13 @@ app.use((err, _req, res, _next) => {
   if (err instanceof InvalidInput) {
     // The contract names UnknownTier and UnknownAddOn as their own 422 codes;
     // anything else that fails validation is InvalidInput.
-    const [head] = err.message.split(':');
-    const code = ['UnknownTier', 'UnknownAddOn'].includes(head) ? head : 'InvalidInput';
-    return res.status(422).json({ error: code, message: err.message });
+    const [head, ...rest] = err.message.split(':');
+    const named = ['UnknownTier', 'UnknownAddOn', 'QuoteBelowListPrice'];
+    const matched = named.includes(head);
+    return res.status(422).json({
+      error: matched ? head : 'InvalidInput',
+      message: (matched ? rest.join(':').trim() : err.message),
+    });
   }
 
   console.error('[booking]', err);

@@ -1,0 +1,16 @@
+# core.autocrlf is on for this repo, which rewrites line endings in anything git
+# decides is text. It guessed wrong about proposal.pdf and silently changed four
+# bytes, leaving the cross-reference table pointing at the wrong offsets. Mark
+# every binary format explicitly so that cannot happen to a hand-in.
+
+*.pdf  binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.zip  binary
+
+# Keep shell scripts LF: infra/db/verify-isolation.sh is run by bash, and CRLF
+# line endings make it fail with a "\r: command not found" that is hard to read.
+*.sh text eol=lf

@@ -6,8 +6,8 @@
 
 Independent illustrators take paid commissions in rounds called "**open comm**". An artist announces a period
 (e.g. October) and a small number of **slots** (e.g. 5). Most do this today with a Google Form, DMs, and a
-spreadsheet, and that setup breaks at the worst moment. When a popular artist posts "OPEN COMM, 5 SLOTS", hundreds of
-followers reply in the same minute. The artist ends up with more takers than slots, has to apologise and refund,
+spreadsheet, and that setup breaks at the worst moment. When an artist posts "OPEN COMM, 5 SLOTS", far more people
+reply than there are slots, most of them within the hour. The artist ends up with more takers than slots, has to apologise and refund,
 and then spends the month tracking who paid the **DP**, which sketch is waiting on approval, and who still owes
 **pelunasan**. OpenComm gives each artist a booking page for their window that never oversells, and tracks every
 commission from request to final file.
@@ -22,8 +22,8 @@ commission from request to final file.
 ## Main flow
 
 1. The artist publishes a pricelist and opens a window with N slots.
-2. A client requests a slot with a brief. One slot is **kept** for them. When no slots are left, the answer is "slots full".
-3. The artist accepts (quoting a price at or above the start-from price) or declines. Declining frees the slot.
+2. A client sends a request with a brief. Nothing is held yet — a request is not an order.
+3. The artist reads it and **accepts** (quoting at or above the start-from price) or declines. Accepting **keeps** a slot; when every slot is kept or taken, the answer is "slots full".
 4. The client pays the DP within 1×24 hours. The slot becomes **taken** and the commission joins the artist's queue.
    If the DP isn't paid in time, the slot is freed.
 5. The artist sends a sketch. The client approves it or asks for a revision (limited number).
@@ -35,9 +35,11 @@ It crosses three areas of the business: booking, payments, and the studio.
 
 ## Hard rule
 
-**An artist never gets more commissions in a window than the slots they opened, even when hundreds of
-clients press Request in the same second.** A related rule: a payment is applied exactly once, even if the payment
-provider's callback arrives twice.
+**An artist never gets more commissions in a window than the slots they opened, however many clients are competing
+for the last one.** The load is bursty and self-inflicted: the artist we interviewed reaches around a thousand people
+with one post, and her last five-slot round drew fifteen to twenty serious enquiries and filled inside thirty to sixty
+minutes. She has already had two clients arrive together for the last slot. A related rule: a payment is applied
+exactly once, even if the payment provider's callback arrives twice.
 
 ## Why this is not a marketplace (R4)
 
@@ -47,5 +49,5 @@ We don't process images: sketches and finals are links, and watermarking is left
 
 ## Who we will interview
 
-_Name_, an illustrator who has run _N_ open-comm rounds on _Instagram / X_ (_handle_). They agreed to a
-20-minute interview on _date_ and to join our 90-minute event-storming session on _date_.
+**Eja**, an illustrator who runs open comms in batches of about five slots. She answered our six questions in
+writing on 22 September 2026. We are arranging a 90-minute event-storming session with her on _date_.

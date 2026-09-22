@@ -94,7 +94,7 @@ paths:
     post:
       tags: [Requests]
       operationId: requestSlot
-      summary: Client requests a slot (keeps one slot if any is left)
+      summary: Client submits a request; no slot is held yet
       requestBody:
         required: true
         content:
@@ -102,22 +102,20 @@ paths:
             schema: { $ref: '#/components/schemas/RequestInput' }
       responses:
         '201':
-          description: A slot is kept for this client; status SUBMITTED
+          description: |
+            Request recorded; status SUBMITTED. **No capacity is consumed.** The artist reviews the brief and
+            decides; a slot is only held once they accept. A full window still accepts requests.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CommissionRequest' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409':
           description: |
-            - `SlotsFull`: every slot is kept or taken (the hard rule)
-            - `AlreadyHoldsSlot`: this client already has a kept or taken slot in this window
+            - `AlreadyRequested`: this client already has a live request in this window
             - `WindowNotOpen`: the window is scheduled or closed
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
-              examples:
-                slotsFull:
-                  value: { error: SlotsFull, message: "All 3 slots in 'October comms' are taken." }
         '422':
           description: "`UnknownTier`, `UnknownAddOn`, or `InvalidRequest`"
           content:
@@ -145,8 +143,13 @@ paths:
     post:
       tags: [Requests]
       operationId: acceptRequest
-      summary: Artist accepts a request with a quote; a DP invoice is issued
-      description: Idempotent. A retry after success returns the same request and invoice.
+      summary: Artist accepts a request with a quote; the slot is kept and a DP invoice is issued
+      description: |
+        **This is where the hard rule is enforced.** Accepting is the moment a slot is held: the artist has read
+        the brief and said yes, so the slot is kept for this client until `payBy`. If every slot is already kept or
+        taken, the accept is refused with `SlotsFull` and nothing changes.
+
+        Idempotent. A retry after success returns the same request and invoice, and does not consume a second slot.
       requestBody:
         required: false
         content:
@@ -160,12 +163,22 @@ paths:
                   description: Defaults to listPriceIDR. Must not be below it.
       responses:
         '200':
-          description: Status ACCEPTED, with depositIDR, depositInvoiceId and payBy
+          description: A slot is kept; status ACCEPTED, with depositIDR, depositInvoiceId and payBy
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CommissionRequest' }
         '404': { $ref: '#/components/responses/NotFound' }
-        '409': { $ref: '#/components/responses/InvalidTransition' }
+        '409':
+          description: |
+            - `SlotsFull`: every slot is already kept or taken (**the hard rule**)
+            - `WindowNotOpen`: the window is closed
+            - `InvalidTransition`: not allowed from the current status
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+              examples:
+                slotsFull:
+                  value: { error: SlotsFull, message: "All 3 slots in 'October comms' are kept or taken." }
         '422':
           description: "`QuoteBelowListPrice`"
           content:
@@ -183,7 +196,7 @@ paths:
     post:
       tags: [Requests]
       operationId: declineRequest
-      summary: Artist declines a submitted request; the slot is released
+      summary: Artist declines a submitted request (no slot was held, so none is released)
       requestBody:
         required: false
         content:

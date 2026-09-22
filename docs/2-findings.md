@@ -1,99 +1,106 @@
-# 2. The domain: findings (PROVISIONAL)
+# 2. The domain: findings
 
-> **Status: provisional — not yet evidence.** Everything here comes from a simulated walkthrough written against
-> [2-interview.md](2-interview.md), not from a real artist. The source document says so itself. It is a **hypothesis sheet**:
-> it tells us what to expect and what to test, and it is not the §3.1 hand-in.
+> **Answered by Eja, 2026-09-22.** An artist who runs open comms answered the six questions directly. Her words are
+> quoted below in the original; this is the first real evidence in this file and it overrides everything the earlier
+> synthesis documents guessed at.
 >
-> **Still to confirm with a real artist.** After that session, tick the Confirm column, rewrite anything they
-> contradict, and delete this banner.
-
-The point of writing it down now is that the real interview stops being a discovery exercise and becomes a
-twenty-minute confirm-or-correct pass, which is a far better use of an artist's time anyway.
+> Two caveats the source itself flags. The Q5 load figures are labelled *"MOCK PLACEHOLDER — ganti dengan angka asli
+> dari Eja sebelum dipakai sebagai bukti"*, so they are **not yet usable as evidence**. And the 90-minute event-storming
+> session has still not happened, so the board export §3.1 asks for does not exist.
 
 ---
 
-## 1. The hot spot (C11) — provisional: **unpaid reservations count toward capacity** (see revision below)
+## 1. The hot spot (C11) — **SETTLED: the slot is kept at accept**
 
-Asked *"at what point is the slot definitely theirs?"*, the answer was **"When I receive the DP"**, with a temporary
-reservation of about 24 hours beforehand, and the reservation created **after the artist accepts**, not when the
-request arrives.
+> "kalau aku, pas orang baru ngechat atau nanya itu belum aku anggap dapet slot sih. soalnya kadang baru nanya harga
+> terus ilang 😭 … biasanya slot mulai aku **keep** pas aku udah liat briefnya terus aku bilang oke / aku accept
+> commnya. dari situ aku udah ga kasih slot itu ke orang lain dulu. tapi kalau dibilang bener-bener confirmed atau
+> booked, itu pas **DP-nya udah masuk**."  — Eja
 
-That is a different shape from what our contracts assume:
+| Moment | What happens to capacity |
+|---|---|
+| Client messages / submits a brief | **nothing** — not a slot yet |
+| Artist accepts | slot is **kept**, held against the limit |
+| DP arrives | slot is **taken**, "fix booked" |
+| 1×24 jam passes with no DP | slot is **released** |
 
-| Step | Our current design | Provisional finding |
+### And it is not first-to-pay
+
+> "kalau tinggal 1 slot aku sebenernya sebisa mungkin ga bilang 'oke bayar aja' ke 2 orang sekaligus … aku bakal keep
+> dulu buat orang yang aku accept pertama … jadi **bukan siapa yang transfer paling cepet**. kalau orang pertama udah
+> aku kasih slot + deadline DP, menurutku ya itu hak dia selama masih di dalam deadline."  — Eja
+
+This kills **Option B** outright. The artist deliberately avoids creating a payment race, because a race is a problem
+she then has to clean up: *"kalau dua-duanya aku suruh bayar terus dua-duanya transfer malah aku yang bikin masalah
+sendiri wkwk."*
+
+### What this means for our contracts
+
+Neither Option A nor Option B. Call it **Option C**, and it is a small change:
+
+| Endpoint | Now | Must become |
 |---|---|---|
-| Request arrives | slot **kept** immediately; `409 SlotsFull` if none free | artist just receives it — requests are **not** capacity-limited |
-| Artist accepts | quote issued, DP invoice created | **now** the slot is reserved, ~24h |
-| DP paid | slot becomes `taken` | "officially booked" |
+| `POST /windows/{id}/requests` | keeps a slot; `409 SlotsFull` when none free | never refused for capacity; drop `SlotsFull` |
+| `POST /requests/{id}/accept` | quote + DP invoice | **also consumes the slot**; gains `409 SlotsFull` |
+| `POST /payment-notifications` | kept → taken | unchanged |
 
-### Why this is not a detail
+The conditional `UPDATE` moves from the request insert to the accept handler. `Window.slotsLeft` keeps its meaning
+(`slotCount - (kept + taken)`); only the moment `kept` increments changes.
 
-Our hard rule sits at the request step, and that is where the **concurrency** comes from — hundreds of clients racing
-in the same second. That race is what satisfies **R2** and what demo step 5 proves with 20 parallel requests.
+### Where the concurrency now lives (R2)
 
-If slots are only consumed when the artist accepts, and the artist accepts by hand one at a time, **there is no race
-left**, and R2 is the reason this project qualifies for the course.
+Two real races survive, and both are worth demonstrating:
 
-### The two branches
+1. **Concurrent accepts.** Eja's own near-miss: *"dua orang chat hampir barengan pas tinggal satu slot, jadi aku harus
+   bilang ke yang satu kalau slot terakhir lagi di-keep orang lain dulu."* She handles this by hand today; the system
+   must handle it atomically. Demo step 5 becomes **20 parallel accepts on 3 slots → 3 × 200, 17 × 409 SlotsFull**.
+2. **Payment versus expiry.** The sweep releases a slot at the deadline while a DP may be landing on the same request.
+   Getting this wrong either oversells or loses a paid slot. Our CommissionRequest card already names it.
 
-**Option A — keep slot-at-request (no change).** Defend it as the product decision: the oversell is the problem we
-are solving, so capacity gates requests. Costs nothing. Contradicts how the artist actually works.
+## 2. Terms in Eja's own words
 
-**Option B — move the race to the DP.** The artist accepts *more* requests than slots (they already expect ghosting),
-each accepted request gets 24 hours, and the slot is confirmed by **whoever pays first**. The contention becomes
-clients paying concurrently: a real race, driven by external payment callbacks, still one conditional `UPDATE` with
-`confirmed <= capacity`. Both hard rules then live in the same place.
+Straight from the transcript, spelled as she spells them. These replace our drafted equivalents in
+[2-glossary.md](2-glossary.md) wherever the two disagree.
 
-Option B needs no refund logic — the losing payment is handled the way the source document suggests: *payment received
-after the slot is gone → do not create a commission → flag for artist review*.
-
-**Revised 2026-09-22 — leaning A, i.e. no change.** A second synthesis document (§37) states the invariant as
-*booked **and reserved** slots never exceed capacity*, with reservations expiring, and defines RESERVED as
-*"the client has claimed it or the artist accepted their request, but the DP has not yet been received"*.
-
-That is our existing invariant, `kept + taken <= slotCount`, not Option B. Unpaid capacity is held and expires —
-which is what our design already does. The open question narrows to **where the reservation begins: at request or
-at accept?** Option B stays prepared but unused; see [3-option-b.md](3-option-b.md).
-
-### The question that decides it
-
-> *"When you accept someone and send payment details — if two people are both inside that 24-hour window for your
-> last slot, who gets it?"*
-
-Ask it as a follow-up to B3. Their answer picks A or B outright.
-
----
-
-## 2. Glossary terms this surfaced
-
-To fold into [2-glossary.md](2-glossary.md) **once a real artist uses them**:
-
-| Term | Provisional meaning | Status |
+| Term | Her definition | Where it lives |
 |---|---|---|
-| **Booked** | DP received and the commission confirmed — distinct from "accepted" | ☐ Confirm |
-| **Minor fix** | A small correction (eye colour) that does **not** consume a revision | ☐ Confirm |
-| **Major revision** | A real change (whole pose) that **does** consume one | ☐ Confirm |
-| **Final preview** | Watermarked or low-res, sent before pelunasan | ☐ Confirm |
-| **Final file** | Full-resolution, released only after pelunasan | ☐ Confirm |
-| **Antrian / queue** | The ordered list of booked commissions, with a rough position told to clients | ☐ Confirm |
+| **di-keep** | "slot sementara ditahan setelah artist accept" | Booking |
+| **DP masuk** | "deposit sudah diterima" | Payments |
+| **fix booked** | "commission sudah confirmed" | Booking |
+| **full** | "semua slot yang aku buka udah keisi / lagi di-keep orang" | Booking |
+| **closed** | "aku memang udah ga nerima request lagi" | Booking |
+| **brief** | "detail permintaan + reference dari client" | Booking |
+| **revisi** | "yang ngubah gambar lumayan banyak" | Studio |
+| **fix** | "koreksi kecil yang tidak dianggap revisi penuh" | Studio |
+| **antrean / queue** | "urutan commission yang sudah booked" | Studio |
+| **release slot** | "slot yang tadinya di-keep dibuka lagi" | Booking |
+| **waitlist** | "orang yang menunggu kalau slot kembali tersedia" | (out of scope) |
 
-The **minor fix vs revision** line is sharper than anything in our current glossary and is worth a question of its own:
-artists apparently arbitrate it case by case, which means the revision counter cannot be fully automatic.
+**full and closed are different, and she was precise about it:** *"full itu soal slotnya, closed itu soal aku masih
+nerima comm atau nggak."* She can close before full — *"kalau tiba-tiba sibuk atau ngerasa workload-nya udah
+kebanyakan"* — which confirms our draft glossary was right to separate them.
+
+**The revision line is about redraw effort, not message count:** *"aku lebih liat seberapa banyak yang harus digambar
+ulang, bukan cuma jumlah chat 'tolong ubah ini'."* A pose change, an outfit change or a big added object is revisi; a
+wrong eye colour or a detail she misread from the brief is not. That means the revision counter **cannot** be
+automatic — the artist has to classify each change, which is a real requirement we had not modelled.
 
 ## 3. The two meaning-shifts (§3.2 requires two)
 
-Both of our draft candidates held up:
+Both come out of Eja's own transcript, which is what makes them usable.
 
-| Word | While filling slots | While drawing |
-|---|---|---|
-| **comm / komisi** | a slot in the round — a unit of capacity | the artwork itself, with stages and revisions |
-| **pricelist vs quote** | the advertised *start-from* price | the agreed price for this one request, which may be far higher |
+**1. "fix" — the good one.** She uses the same word for two unrelated things in two different parts of the business:
 
-The pricing example was concrete: full body advertised from Rp400k, but armour, a weapon, an extra character and a
-background take the agreed price to Rp725k. **Existing commissions keep their agreed price when the pricelist
-changes** — which is exactly the snapshot rule already in our CommissionWindow card.
+| Where | What "fix" means |
+|---|---|
+| Booking | **settled, confirmed** — *"DP masuk = **fix booked**"* |
+| Studio | **a small correction** — *"kalau cuma hal kecil … biasanya aku anggap **fix** aja"* |
 
-⚠ These only count when a real artist says them. Get both on the recording.
+Neither side needs the other's version, and nobody outside the artist's head would guess they are the same word. This
+is exactly the kind of find the handout calls the most useful thing in the exercise.
+
+**2. "comm"** — the round versus the job. *"buka comm"* and *"close comm"* are the window; *"aku accept **commnya**"*
+is one client's artwork. Same word, one meaning in Booking and another in Studio.
 
 ## 4. Domain events (27) — provisional
 

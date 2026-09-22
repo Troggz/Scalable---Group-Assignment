@@ -25,8 +25,8 @@ The payment provider is an external system, not a user.
 1. The artist publishes a **pricelist**: tiers with start-from prices, add-ons, DP percentage, and number of free revisions.
 2. The artist opens a **window**: title, number of slots, open and close time.
 3. Anyone can see a window, its prices, and how many **slots are left**.
-4. A client **requests a slot** (tier, add-ons, brief, reference links). One slot per client per window.
-5. The artist **accepts** with a quote (at or above the start-from price) or **declines**. Declining frees the slot.
+4. A client **sends a request** (tier, add-ons, brief, reference links). One live request per client per window; no slot is held yet.
+5. The artist **accepts** with a quote (at or above the start-from price) or **declines**. Accepting keeps a slot; declining holds nothing.
 6. The client **pays the DP**. An unpaid DP past the deadline frees the slot.
 7. The artist sends a **sketch**. The client **approves** it or **requests a revision**, up to the agreed limit.
 8. The artist sends the **final**: a preview link and a hi-res link.
@@ -42,10 +42,9 @@ notifications by email or push · a mobile app.
 
 1. Artist *rara* publishes a pricelist (Half body from Rp250.000, Background +Rp50.000, DP 50%, 2 free revisions).
 2. Rara opens *October comms* with **3 slots**, from 1 Oct 19:00 WIB to 31 Oct.
-3. At 19:00, clients request slots. Each accepted request **keeps** one slot.
-4. When every slot is kept or taken, the next request is rejected with **"slots full"**.
-5. Rara reviews a request against her TOS and **accepts** it with a quote of Rp350.000. A DP invoice for Rp175.000 is issued, due in 1×24 hours.
-   (If she declines instead, the slot is freed.)
+3. At 19:00, clients send requests. A request holds nothing — the artist decides.
+4. Rara reviews a request against her TOS and **accepts** it with a quote of Rp350.000. Accepting **keeps** one slot, and a DP invoice for Rp175.000 is issued, due in 1×24 hours.
+5. When every slot is kept or taken, the next **accept** is rejected with **"slots full"**. (If she declines instead, nothing was held.)
 6. The client pays. The payment provider confirms it, the slot becomes **taken**, and the commission joins Rara's **queue**.
    (If the DP isn't paid by the deadline, the slot is freed.)
 7. Rara sends a sketch. The client asks for one revision, then approves the new sketch.
@@ -54,11 +53,13 @@ notifications by email or push · a mobile app.
 
 ## 1.e Hard rule and load
 
-**Hard rule:** an artist never gets more commissions in a window than the slots they opened, even when
-hundreds of clients press *Request* in the same second. *(Related rule: a payment is applied exactly once, even if the
-provider's callback arrives twice.)*
+**Hard rule:** an artist never gets more commissions in a window than the slots they opened, however many clients
+are competing for the last one. *(Related rule: a payment is applied exactly once, even if the provider's callback
+arrives twice.)*
 
-**Load:** load arrives in spikes. When a popular artist posts "OPEN COMM, 5 SLOTS", several hundred followers
-press Request in the first minute, the slots are gone within seconds, and everyone else needs a quick, clean "slots full". A
+**Load:** load arrives in spikes. Eja, the artist we interviewed, reaches about a thousand people with one post; her
+last five-slot round drew fifteen to twenty serious enquiries and was full inside thirty to sixty minutes. The
+collisions are few but real — she has already had two clients arrive together for the last slot, and handles it today
+by telling one of them to wait. Everyone who misses out needs a quick, clean "slots full". A
 second, smaller burst follows as accepted clients pay their DP before the 1×24-hour deadline and the provider sends its
 callbacks, sometimes more than once.
